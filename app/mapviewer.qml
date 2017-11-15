@@ -48,6 +48,7 @@ import AGL.Demo.Controls 1.0
 import "map"
 import "menus"
 import "helper.js" as Helper
+import "api" as API
 
 ApplicationWindow {
     id: appWindow
@@ -59,6 +60,11 @@ ApplicationWindow {
     property variant fromCoordinate: QtPositioning.coordinate(59.9483, 10.7695)
     property variant toCoordinate: QtPositioning.coordinate(59.9645, 10.671)
     //! [routecoordinate]
+
+    API.GPS {
+        id: gps
+        url: bindingAddress
+    }
 
     function createMap(provider)
     {

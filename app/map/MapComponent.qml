@@ -38,7 +38,9 @@
 **
 ****************************************************************************/
 import QtQuick 2.5
+import QtQuick.Layouts 1.3
 import QtQuick.Controls 1.4
+import QtQuick.Extras 1.4
 import QtLocation 5.6
 import QtPositioning 5.5
 import "../helper.js" as Helper
@@ -267,20 +269,17 @@ Map {
     // Enable pan, flick, and pinch gestures to zoom in and out
     gesture.acceptedGestures: MapGestureArea.PanGesture | MapGestureArea.FlickGesture | MapGestureArea.PinchGesture
     gesture.flickDeceleration: 3000
-    gesture.enabled: true
+    gesture.enabled: !map.followme
 //! [mapnavigation]
     focus: true
     onCopyrightLinkActivated: Qt.openUrlExternally(link)
 
     onCenterChanged:{
         scaleTimer.restart()
-        if (map.followme)
-            if (map.center != positionSource.position.coordinate) map.followme = false
     }
 
     onZoomLevelChanged:{
         scaleTimer.restart()
-        if (map.followme) map.center = positionSource.position.coordinate
     }
 
     onWidthChanged:{
@@ -324,18 +323,8 @@ Map {
     Binding {
         target: map
         property: 'center'
-        value: positionSource.position.coordinate
         when: followme
     }*/
-
-    PositionSource{
-        id: positionSource
-        active: followme
-
-        onPositionChanged: {
-            map.center = positionSource.position.coordinate
-        }
-    }
 
     MapQuickItem {
         id: locationPoint
@@ -367,6 +356,17 @@ Map {
         columns: 1
         width: 300
         height: 300
+
+        ToggleButton {
+            id: followme
+            text: "GeoLocation Pan"
+            checked: map.followme
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            onClicked: {
+                map.followme = !map.followme
+            }
+        }
 
         Button {
             text: "Lookup Route"
