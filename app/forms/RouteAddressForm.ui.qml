@@ -44,12 +44,9 @@ import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
 
 Item {
-    property alias fromStreet: fromStreet
-    property alias fromCountry: fromCountry
     property alias toStreet: toStreet
     property alias toCity: toCity
     property alias toCountry: toCountry
-    property alias fromCity: fromCity
     property alias goButton: goButton
     property alias clearButton: clearButton
     property alias cancelButton: cancelButton
@@ -90,44 +87,6 @@ Item {
             rows: 1
             columns: 2
             anchors.fill: parent
-
-            Label {
-                id: label1
-                text: qsTr("From")
-                font.bold: true
-                anchors.horizontalCenter: parent.horizontalCenter
-                Layout.columnSpan : 2
-            }
-
-            Label {
-                id: label2
-                text: qsTr("Street")
-            }
-
-            TextField {
-                id: fromStreet
-                Layout.fillWidth: true
-            }
-
-            Label {
-                id: label3
-                text: qsTr("City")
-            }
-
-            TextField {
-                id: fromCity
-                Layout.fillWidth: true
-            }
-
-            Label {
-                id: label7
-                text: qsTr("Country")
-            }
-
-            TextField {
-                id: fromCountry
-                Layout.fillWidth: true
-            }
 
             Label {
                 id: label6

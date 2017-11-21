@@ -377,7 +377,7 @@ Map {
                 stackView.push(Qt.resolvedUrl("../forms/RouteAddress.qml"),
                                      { "plugin": map.plugin,
                                        "toAddress": toAddress,
-                                       "fromAddress": fromAddress})
+                                       "fromCoordinate": map.location})
                 stackView.currentItem.showRoute.connect(map.calculateCoordinateRoute)
                 stackView.currentItem.showMessage.connect(stackView.showMessage)
                 stackView.currentItem.closeForm.connect(stackView.closeForm)

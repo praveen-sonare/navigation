@@ -44,31 +44,25 @@ import QtPositioning 5.5
 
 RouteAddressForm {
     property alias plugin : tempGeocodeModel.plugin;
-    property variant fromAddress;
     property variant toAddress;
+    property variant fromCoordinate;
     signal showMessage(string topic, string message)
     signal showRoute(variant startCoordinate,variant endCoordinate)
     signal closeForm()
 
     goButton.onClicked: {
         tempGeocodeModel.reset()
-        fromAddress.country =  fromCountry.text
-        fromAddress.street = fromStreet.text
-        fromAddress.city =  fromCity.text
         toAddress.country = toCountry.text
         toAddress.street = toStreet.text
         toAddress.city = toCity.text
-        tempGeocodeModel.startCoordinate = QtPositioning.coordinate()
+        tempGeocodeModel.startCoordinate = fromCoordinate
         tempGeocodeModel.endCoordinate = QtPositioning.coordinate()
-        tempGeocodeModel.query = fromAddress
+        tempGeocodeModel.query = fromCoordinate
         tempGeocodeModel.update();
         goButton.enabled = false;
     }
 
     clearButton.onClicked: {
-        fromStreet.text = ""
-        fromCity.text = ""
-        fromCountry.text = ""
         toStreet.text = ""
         toCity.text = ""
         toCountry.text = ""
@@ -79,9 +73,6 @@ RouteAddressForm {
     }
 
     Component.onCompleted: {
-        fromStreet.text  = fromAddress.street
-        fromCity.text =  fromAddress.city
-        fromCountry.text = fromAddress.country
         toStreet.text = toAddress.street
         toCity.text = toAddress.city
         toCountry.text = toAddress.country
@@ -102,7 +93,7 @@ RouteAddressForm {
         }
 
         onStatusChanged: {
-            if ((status == GeocodeModel.Ready) && (count == 1)) {
+            if ((status == GeocodeModel.Ready) && count >= 1) {
                 success++
                 if (success == 1) {
                     startCoordinate.latitude = get(0).coordinate.latitude
