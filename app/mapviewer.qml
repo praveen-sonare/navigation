@@ -41,6 +41,7 @@
 import QtQuick 2.5
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.0
+import QtQuick.VirtualKeyboard 2.1
 import QtLocation 5.6
 import QtPositioning 5.5
 import AGL.Demo.Controls 1.0
@@ -138,6 +139,14 @@ ApplicationWindow {
         city: "Oslo"
         country: "Norway"
         postalCode: "0791"
+    }
+
+    InputPanel {
+            id: inputPanel
+            visible: Qt.inputMethod.visible
+            y: Qt.inputMethod.visible ? parent.height - inputPanel.height : parent.height
+            anchors.left: parent.left
+            anchors.right: parent.right
     }
 
     MainMenu {

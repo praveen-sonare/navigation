@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
 
     QString myname = QString("Navigation");
 
+    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
     QGuiApplication app(argc, argv);
 
     QQuickStyle::setStyle("AGL");

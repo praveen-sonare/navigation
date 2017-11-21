@@ -5,6 +5,11 @@ PKGCONFIG += libhomescreen qlibwindowmanager
 
 QT = qml network quick positioning location quickcontrols2
 
+static {
+    QTPLUGIN += qtvirtualkeyboardplugin
+    QT += svg
+}
+
 SOURCES += main.cpp
 
 RESOURCES += \
