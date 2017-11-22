@@ -136,20 +136,15 @@ ApplicationWindow {
     //! [geocode0]
     Address {
         id :fromAddress
-        street: "Sandakerveien 116"
-        city: "Oslo"
-        country: "Norway"
-        state : ""
-        postalCode: "0484"
     }
     //! [geocode0]
 
     Address {
         id: toAddress
-        street: "Holmenkollveien 140"
-        city: "Oslo"
-        country: "Norway"
-        postalCode: "0791"
+        street: "Golden Gate Park"
+        city: "San Francisco"
+        state: "California"
+        country: "US"
     }
 
     InputPanel {
