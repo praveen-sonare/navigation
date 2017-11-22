@@ -55,6 +55,7 @@ RouteAddressForm {
         toAddress.country = toCountry.text
         toAddress.street = toStreet.text
         toAddress.city = toCity.text
+        toAddress.state = toState.text
         tempGeocodeModel.startCoordinate = fromCoordinate
         tempGeocodeModel.endCoordinate = QtPositioning.coordinate()
         tempGeocodeModel.query = fromCoordinate
@@ -65,6 +66,7 @@ RouteAddressForm {
     clearButton.onClicked: {
         toStreet.text = ""
         toCity.text = ""
+        toState.text = ""
         toCountry.text = ""
     }
 
@@ -75,6 +77,7 @@ RouteAddressForm {
     Component.onCompleted: {
         toStreet.text = toAddress.street
         toCity.text = toAddress.city
+        toState.text = toAddress.state
         toCountry.text = toAddress.country
     }
 

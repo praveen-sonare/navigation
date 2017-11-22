@@ -46,6 +46,7 @@ import QtQuick.Layouts 1.2
 Item {
     property alias toStreet: toStreet
     property alias toCity: toCity
+    property alias toState: toState
     property alias toCountry: toCountry
     property alias goButton: goButton
     property alias clearButton: clearButton
@@ -113,6 +114,16 @@ Item {
 
             TextField {
                 id: toCity
+                Layout.fillWidth: true
+            }
+
+            Label {
+                id: label9
+                text: qsTr("State")
+            }
+
+            TextField {
+                id: toState
                 Layout.fillWidth: true
             }
 
