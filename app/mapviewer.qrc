@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>mapviewer.qml</file>
 	<file>api/GPS.qml</file>
+	<file>api/GeoClue.qml</file>
         <file>map/MapComponent.qml</file>
         <file>map/Marker.qml</file>
         <file>map/PolylineItem.qml</file>

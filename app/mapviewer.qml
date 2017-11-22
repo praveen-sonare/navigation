@@ -66,6 +66,11 @@ ApplicationWindow {
         url: bindingAddress
     }
 
+    API.GeoClue {
+        id: geoclue
+        url: bindingAddress
+    }
+
     function createMap(provider)
     {
         var plugin
