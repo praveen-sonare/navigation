@@ -75,6 +75,13 @@ Map {
     signal showPointMenu(variant coordinate)
     signal showRouteList()
 
+
+    center {
+        // null island
+        latitude: 0
+        longitude: 0
+    }
+
     function geocodeMessage()
     {
         var street, district, city, county, state, countryCode, country, postalCode, latitude, longitude, text
