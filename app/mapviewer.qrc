@@ -30,6 +30,7 @@
         <file>menus/MarkerPopupMenu.qml</file>
         <file>menus/ItemPopupMenu.qml</file>
         <file>helper.js</file>
+	<file>resources/car.png</file>
         <file>resources/scale_end.png</file>
         <file>resources/scale.png</file>
         <file>resources/marker.png</file>

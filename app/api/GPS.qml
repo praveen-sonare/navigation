@@ -56,13 +56,17 @@ WebSocket {
                 var payload = JSON.parse(JSON.stringify(json[2]))
                 var event = payload.event
                 if (event == "gps/location") {
-                    var latitude = json[2].data.latitude
-                    var longitude = json[2].data.longitude
+                    var data = json[2].data
+                    var latitude = data.latitude
+                    var longitude = data.longitude
                     var location = QtPositioning.coordinate(latitude, longitude)
                     if (map.followme || !map.location) {
                         map.center = location
                     }
                     map.location = location
+                    if (data.speed > 1) {
+                        map.updateCompass(data.track)
+                    }
                 }
                 break
         }

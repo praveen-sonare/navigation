@@ -267,6 +267,10 @@ Map {
         //! [geocode1]
     }
 
+    function updateCompass(heading)
+    {
+        compass.rotation = heading - 90
+    }
 
 //! [coord]
     zoomLevel: (maximumZoomLevel - minimumZoomLevel)/2
@@ -335,7 +339,12 @@ Map {
 
     MapQuickItem {
         id: locationPoint
-        sourceItem: Rectangle { width: 14; height: 14; color: "#e41e25"; border.width: 2; border.color: "white"; smooth: true; radius: 7 }
+        sourceItem: Image {
+                id: compass
+                width: 100 * (map.zoomLevel / map.maximumZoomLevel)
+                height: 50 * (map.zoomLevel / map.maximumZoomLevel)
+                source: "../resources/car.png"
+            }
         coordinate: location
         opacity: 1.0
         anchorPoint: Qt.point(sourceItem.width/2, sourceItem.height/2)
