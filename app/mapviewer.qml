@@ -71,6 +71,11 @@ ApplicationWindow {
         url: bindingAddress
     }
 
+     API.GeoFence {
+        id: geofence
+        url: bindingAddress
+    }
+
     function createMap(provider)
     {
         var plugin
