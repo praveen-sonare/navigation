@@ -8,6 +8,7 @@
   <license>APL 2.0</license>
   <feature name="urn:AGL:widget:required-api">
     <param name="geoclue" value="ws" />
+    <param name="geofence" value="ws" />
     <param name="gps" value="ws" />
     <param name="windowmanager" value="ws" />
     <param name="homescreen" value="ws" />
