@@ -7,6 +7,7 @@
   <author>Matt Ranostay &lt;matt.ranostay@konsulko.com&gt;</author>
   <license>APL 2.0</license>
   <feature name="urn:AGL:widget:required-api">
+    <param name="geoclue" value="ws" />
     <param name="gps" value="ws" />
     <param name="windowmanager" value="ws" />
     <param name="homescreen" value="ws" />
