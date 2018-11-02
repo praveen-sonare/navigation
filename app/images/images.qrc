@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>car-focus.png</file>
+        <file>car-marker.png</file>
+		<file>car-marker2.png</file>
+        <file>marker-green.png</file>
+        <file>marker-red.png</file>
+		<file>marker-end.png</file>
+        <file>simple-bottom-background-white.png</file>
+        <file>arrow-0.png</file>
+        <file>arrow-l-30.png</file>
+        <file>arrow-l-45.png</file>
+        <file>arrow-l-75.png</file>
+        <file>arrow-l-180.png</file>
+        <file>arrow-r-30.png</file>
+        <file>arrow-r-45.png</file>
+        <file>arrow-r-75.png</file>
+        <file>arrow-r-180.png</file>
+    </qresource>
+</RCC>
