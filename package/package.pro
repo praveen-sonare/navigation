@@ -1,5 +1,5 @@
 
-DISTFILES = icon.svg config.xml
+DISTFILES = icon.svg config.xml Coordinate.txt
 
 copy_icon.target = $$OUT_PWD/root/icon.svg
 copy_icon.depends = $$_PRO_FILE_PWD_/icon.svg
@@ -13,7 +13,13 @@ copy_config.commands = $(COPY_FILE) \"$$replace(copy_config.depends, /, $$QMAKE_
 QMAKE_EXTRA_TARGETS += copy_config
 PRE_TARGETDEPS += $$copy_config.target
 
+copy_coordinate.target = $$OUT_PWD/root/Coordinate.txt
+copy_coordinate.depends = $$_PRO_FILE_PWD_/Coordinate.txt
+copy_coordinate.commands = $(COPY_FILE) \"$$replace(copy_coordinate.depends, /, $$QMAKE_DIR_SEP)\" \"$$replace(copy_coordinate.target, /, $$QMAKE_DIR_SEP)\"
+QMAKE_EXTRA_TARGETS += copy_coordinate
+PRE_TARGETDEPS += $$copy_coordinate.target
+
 wgt.target = package
-wgt.commands = wgtpkg-pack -f -o navigation.wgt root
+wgt.commands = wgtpkg-pack -f -o tbtnavi.wgt root
 
 QMAKE_EXTRA_TARGETS += wgt

@@ -1,13 +1,18 @@
-TEMPLATE = app
-QMAKE_LFLAGS += "-Wl,--hash-style=gnu -Wl,--as-needed"
-
 load(configure)
+
 qtCompileTest(libhomescreen)
+qtCompileTest(qlibwindowmanager)
 
 config_libhomescreen {
     CONFIG += link_pkgconfig
-    PKGCONFIG += homescreen
+    PKGCONFIG += libhomescreen
     DEFINES += HAVE_LIBHOMESCREEN
+}
+
+config_qlibwindowmanager {
+    CONFIG += link_pkgconfig
+    PKGCONFIG += qlibwindowmanager
+    DEFINES += HAVE_QLIBWINDOWMANAGER
 }
 
 DESTDIR = $${OUT_PWD}/../package/root/bin
