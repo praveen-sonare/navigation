@@ -14,6 +14,6 @@ QMAKE_EXTRA_TARGETS += copy_config
 PRE_TARGETDEPS += $$copy_config.target
 
 wgt.target = package
-wgt.commands = wgtpkg-pack -f -o navigation.wgt root
+wgt.commands = wgtpkg-pack -f -o tbtnavi.wgt root
 
 QMAKE_EXTRA_TARGETS += wgt

@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/qmldir</file>
+        <file>qml/Main.qml</file>
+        <file>qml/MapWindow.qml</file>
+        <file>qml/TbtBoard.qml</file>
+    </qresource>
+</RCC>
