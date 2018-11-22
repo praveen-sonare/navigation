@@ -368,7 +368,8 @@ Item {
                 }
                 else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionUTurnRight)
                 {
-                    turnDirectionBoard.source = "qrc:arrow-r-180-full.png";
+                    //TODO modify qtlocation U-Turn best.For test, change app source.
+                    turnDirectionBoard.source = "qrc:arrow-l-180-full.png";
                 }
                 else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionLightLeft)
                 {
@@ -384,7 +385,8 @@ Item {
                 }
                 else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionUTurnLeft)
                 {
-                    turnDirectionBoard.source = "qrc:arrow-l-180-full.png";
+                    //TODO modify qtlocation U-Turn best.For test, change app source.
+                    turnDirectionBoard.source = "qrc:arrow-r-180-full.png";
                 }
                 else
                 {
