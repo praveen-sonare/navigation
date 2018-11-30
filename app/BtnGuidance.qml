@@ -36,10 +36,6 @@ Item {
     function discardWaypoints() {
         map.initDestination()
 
-        if(btn_guidance.sts_guide != 0){
-            map.qmlSignalStopDemo()
-        }
-
         if(map.center !== map.currentpostion){
             btn_present_position.state = "Optional"
         }

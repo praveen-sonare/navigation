@@ -35,26 +35,12 @@
 #include <QtQml/QQmlContext>
 #include <QtQuickControls2/QQuickStyle>
 #include <QQuickWindow>
-#include <QtDBus/QDBusConnection>
 #include "markermodel.h"
-#include "dbus_server.h"
 #include "guidance_module.h"
 #include "file_operation.h"
 
 int main(int argc, char *argv[])
 {
-	
-    // for dbusIF
-    QString pathBase = "org.agl.";
-    QString objBase = "/org/agl/";
-    QString	serverName = "naviapi";
-
-    if (!QDBusConnection::sessionBus().isConnected()) {
-        qWarning("Cannot connect to the D-Bus session bus.\n"
-                 "Please check your system settings and try again.\n");
-        return 1;
-    }
-	
 #if	USE_QTAGLEXTRAS
 	AGLApplication app(argc, argv);
 	app.setApplicationName("navigation");
@@ -142,7 +128,6 @@ int main(int argc, char *argv[])
 	QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
 	QObject::connect(window, SIGNAL(frameSwapped()), qwmHandler, SLOT(slotActivateSurface()));
     QObject *map = engine.rootObjects().first()->findChild<QObject*>("map");
-    DBus_Server dbus(pathBase,objBase,serverName,map);
 
 #else	// for only libwindowmanager
 	QGuiApplication app(argc, argv);
@@ -162,7 +147,6 @@ int main(int argc, char *argv[])
 
     engine.load(QUrl(QStringLiteral("qrc:/navigation.qml")));
     QObject *map = engine.rootObjects().first()->findChild<QObject*>("map");
-    DBus_Server dbus(pathBase,objBase,serverName,map);
 
 #endif
 	

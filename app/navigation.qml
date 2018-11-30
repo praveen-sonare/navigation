@@ -55,11 +55,6 @@ ApplicationWindow {
         property var poiArray: new Array
         property int last_segmentcounter : -1
 
-        signal qmlSignalRouteInfo(double srt_lat,double srt_lon,double end_lat,double end_lon);
-        signal qmlSignalPosInfo(double lat,double lon,double drc,double dst);
-        signal qmlSignalStopDemo();
-        signal qmlSignalArrvied();
-
         width: parent.width
         height: parent.height
 		plugin: Plugin {
@@ -307,12 +302,9 @@ ApplicationWindow {
                 var waypointlist = routeQuery.waypoints
                 for(var i=1; i<waypoint_count; i++) {
                     markerModel.addMarker(waypointlist[i])
-
-//                    map.addPoiIconSLOT(waypointlist[i].latitude,waypointlist[i].longitude,i % 5) // for Debug
                 }
 
                 routeModel.update()
-                map.qmlSignalRouteInfo(car_position_lat, car_position_lon,coord.latitude,coord.longitude)
 
                 // update icon_end_point
                 icon_end_point.coordinate = coord
@@ -327,7 +319,6 @@ ApplicationWindow {
             // reset currentpostion
             map.currentpostion = QtPositioning.coordinate(car_position_lat, car_position_lon)
             car_accumulated_distance = 0
-            map.qmlSignalPosInfo(car_position_lat, car_position_lon,car_direction,car_accumulated_distance)
 
             routeQuery.clearWaypoints();
             routeQuery.addWaypoint(map.currentpostion)
@@ -418,112 +409,6 @@ ApplicationWindow {
             map.currentpostion = QtPositioning.coordinate(curlat+addlat, curlon+addlon);
         }
 
-        function addPoiIconSLOT(lat,lon,type) {
-            console.log("called addPoiIcon")
-            var poiItem;
-            switch(type){
-                case 0:
-                    poiItem = Qt.createQmlObject("
-                            import QtQuick 2.0;
-                            import QtLocation 5.9;
-                            MapQuickItem {
-                                id: poi_icon;
-                                anchorPoint.x: icon_flag_liteblue_image.width/2;
-                                anchorPoint.y: icon_flag_liteblue_image.height;
-                                sourceItem: Image {
-                                    id: icon_flag_liteblue_image;
-                                    width: 32;
-                                    height: 37;
-                                    source: \"images/Flag-export_lightblue.png\";
-                                }
-                            }
-                        ",map,"dynamic");
-                    break;
-                case 1:
-                    poiItem = Qt.createQmlObject("
-                            import QtQuick 2.0;
-                            import QtLocation 5.9;
-                            MapQuickItem {
-                                id: poi_icon;
-                                anchorPoint.x: icon_building_image.width/2;
-                                anchorPoint.y: icon_building_image.height;
-                                sourceItem: Image {
-                                    id: icon_building_image;
-                                    width: 32;
-                                    height: 37;
-                                    source: \"images/BuildingIcon.png\";
-                                }
-                            }
-                        ",map,"dynamic");
-                    break;
-                case 2:
-                    poiItem = Qt.createQmlObject("
-                            import QtQuick 2.0;
-                            import QtLocation 5.9;
-                            MapQuickItem {
-                                id: poi_icon;
-                                anchorPoint.x: icon_church_image.width/2;
-                                anchorPoint.y: icon_church_image.height;
-                                sourceItem: Image {
-                                    id: icon_church_image;
-                                    width: 32;
-                                    height: 37;
-                                    source: \"images/ChurchIcon.png\";
-                                }
-                            }
-                        ",map,"dynamic");
-                    break;
-                case 3:
-                    poiItem = Qt.createQmlObject("
-                            import QtQuick 2.0;
-                            import QtLocation 5.9;
-                            MapQuickItem {
-                                id: poi_icon;
-                                anchorPoint.x: icon_restaurant_image.width/2;
-                                anchorPoint.y: icon_restaurant_image.height;
-                                sourceItem: Image {
-                                    id: icon_restaurant_image;
-                                    width: 32;
-                                    height: 37;
-                                    source: \"images/RestaurantMapIcon.png\";
-                                }
-                            }
-                        ",map,"dynamic");
-                    break;
-                case 4:
-                    poiItem = Qt.createQmlObject("
-                            import QtQuick 2.0;
-                            import QtLocation 5.9;
-                            MapQuickItem {
-                                id: poi_icon;
-                                anchorPoint.x: icon_supermarket_image.width/2;
-                                anchorPoint.y: icon_supermarket_image.height;
-                                sourceItem: Image {
-                                    id: icon_supermarket_image;
-                                    width: 32;
-                                    height: 37;
-                                    source: \"images/SupermarketMapIcon.png\";
-                                }
-                            }
-                        ",map,"dynamic");
-                    break;
-                default:
-                    poiItem = null;
-                    break;
-            }
-
-            if(poiItem === null) {
-               console.log("error creating object" +  poiItem.errorString());
-               return false;
-            }
-
-            poiItem.coordinate = QtPositioning.coordinate(lat, lon);
-            map.addMapItem(poiItem);
-            poiArray.push(poiItem);
-//            console.log("success creating object");
-            return true;
-        }
-
 		MouseArea {
 			id: mouseArea
 			property variant lastCoordinate
@@ -595,7 +480,6 @@ ApplicationWindow {
                     if(pathcounter != 0){
                         car_accumulated_distance += next_distance
                     }
-                    map.qmlSignalPosInfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
                     if(pathcounter < routeModel.get(0).path.length - 1){
                         pathcounter++
                     }
@@ -603,14 +487,12 @@ ApplicationWindow {
                     {
                         // Arrive at your destination
                         btn_guidance.sts_guide = 0
-                        map.qmlSignalArrvied()
                     }
                 }else{
                     setNextCoordinate(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,root.car_moving_distance)
                     if(pathcounter != 0){
                         car_accumulated_distance += root.car_moving_distance
                     }
-                    map.qmlSignalPosInfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
                 }
 //                console.log("NextCoordinate:",map.currentpostion.latitude,",",map.currentpostion.longitude)
 
@@ -660,20 +542,6 @@ ApplicationWindow {
             console.log("called removePoiIcons")
             while(poiArray.length>0)
                 map.removeMapItem(poiArray.pop())
-        }
-
-        function doGetRouteInfoSlot(){
-            if(btn_guidance.sts_guide == 0){ // idle
-                console.log("called doGetRouteInfoSlot sts_guide == idle")
-                map.qmlSignalPosInfo(car_position_lat, car_position_lon,car_direction,car_accumulated_distance);
-            }else if(btn_guidance.sts_guide == 1){ // Routing
-                console.log("called doGetRouteInfoSlot sts_guide == Routing")
-                map.qmlSignalPosInfo(car_position_lat, car_position_lon,car_direction,car_accumulated_distance);
-                map.qmlSignalRouteInfo(car_position_lat, car_position_lon,routeQuery.waypoints[1].latitude,routeQuery.waypoints[1].longitude);
-            }else if(btn_guidance.sts_guide == 2){ // onGuide
-                console.log("called doGetRouteInfoSlot sts_guide == onGuide")
-                map.qmlSignalRouteInfo(car_position_lat, car_position_lon,routeQuery.waypoints[1].latitude,routeQuery.waypoints[1].longitude);
-            }
         }
 
         function rotateMapSmooth(){
