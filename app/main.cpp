@@ -23,8 +23,6 @@
 #include <qlibwindowmanager.h>
 #include <qlibhomescreen.h>
 #include <string>
-#include <ilm/ivi-application-client-protocol.h>
-#include <wayland-client.h>
 #endif
 #include <QtCore/QDebug>
 #include <QtCore/QCommandLineParser>
