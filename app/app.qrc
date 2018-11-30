@@ -1,10 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/qmldir</file>
-        <file>qml/CustomLabel.qml</file>
-        <file>qml/DateAndTime.qml</file>
         <file>qml/Main.qml</file>
         <file>qml/MapWindow.qml</file>
-        <file>qml/Coordinate.txt</file>
+        <file>qml/TbtBoard.qml</file>
     </qresource>
 </RCC>

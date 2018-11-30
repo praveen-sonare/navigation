@@ -1,7 +1,7 @@
 TARGET = tbtnavi
 TEMPLATE = app
 
-QT += qml network quick positioning location sql widgets
+QT += qml network quick positioning location sql widgets dbus
 
 CONFIG += c++14
 
@@ -13,10 +13,12 @@ ios|android {
 
 SOURCES += \
     main.cpp \
-    qcheapruler.cpp
+    qcheapruler.cpp \
+    dbus_client.cpp
 
 HEADERS += \
-    qcheapruler.hpp
+    qcheapruler.hpp \
+    dbus_client.h
 
 INCLUDEPATH += \
     ../include
@@ -28,3 +30,5 @@ RESOURCES += \
     images/images.qrc \
     app.qrc
 
+DBUS_ADAPTORS += org.agl.naviapi.xml
+DBUS_INTERFACES += org.agl.naviapi.xml

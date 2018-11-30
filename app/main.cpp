@@ -6,8 +6,10 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickWindow>
+#include <QtDBus/QDBusConnection>
 
 #include "qcheapruler.hpp"
+#include "dbus_client.h"
 
 #ifdef HAVE_LIBHOMESCREEN
 #include <libhomescreen.hpp>
@@ -18,6 +20,12 @@
 
 int main(int argc, char *argv[])
 {
+    if (!QDBusConnection::sessionBus().isConnected()) {
+        qWarning("Cannot connect to the D-Bus session bus.\n"
+                 "Please check your system settings and try again.\n");
+        return 1;
+    }
+
     QString myname = QString("tbtnavi");
 
     QGuiApplication app(argc, argv);
@@ -35,23 +43,11 @@ int main(int argc, char *argv[])
     QStringList positionalArguments = parser.positionalArguments();
 
     QQmlApplicationEngine engine;
-    QQmlContext *context = engine.rootContext();
-    QUrl bindingAddress;
     int port = 0;
     QString secret;
     if (positionalArguments.length() == 2) {
         port = positionalArguments.takeFirst().toInt();
         secret = positionalArguments.takeFirst();
-        bindingAddress.setScheme(QStringLiteral("ws"));
-        bindingAddress.setHost(QStringLiteral("localhost"));
-        bindingAddress.setPort(port);
-        bindingAddress.setPath(QStringLiteral("/api"));
-        QUrlQuery query;
-        query.addQueryItem(QStringLiteral("token"), secret);
-        bindingAddress.setQuery(query);
-        context->setContextProperty(QStringLiteral("bindingAddress"), bindingAddress);
-    } else {
-        context->setContextProperty(QStringLiteral("bindingAddress"), bindingAddress);
     }
 
 #ifdef HAVE_QLIBWINDOWMANAGER
@@ -98,13 +94,20 @@ int main(int argc, char *argv[])
 
     QObject *root = engine.rootObjects().first();
     QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
+
+    //make the DBus connection info
+    QString pathBase = "org.agl.";
+    QString objBase = "/org/agl/";
+    QString	serverName = "naviapi";
+    QObject *mapWindow = root->findChild<QObject*>("mapwindow");
+    dbus_client dbus(pathBase, objBase, serverName, mapWindow);
+
 #ifdef HAVE_QLIBWINDOWMANAGER
 //    QObject::connect(window, SIGNAL(frameSwapped()), qwm, SLOT(slotActivateSurface()));
     // Create an event callback against an event type. Here a lambda is called when SyncDraw event occurs
     qwm->set_event_handler(QLibWindowmanager::Event_SyncDraw, [root, qwm, myname](json_object *object) {
         fprintf(stderr, "Surface got syncDraw!\n");
         qwm->endDraw(myname);
-        QMetaObject::invokeMethod(root, "startDemo", Q_ARG(QVariant, true));
     });
     // Create an event callback against an event type. Here a lambda is called when SyncDraw event occurs
     qwm->set_event_handler(QLibWindowmanager::Event_Active, [root](json_object *object) {

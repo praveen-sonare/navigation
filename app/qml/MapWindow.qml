@@ -7,100 +7,23 @@ import com.mapbox.cheap_ruler 1.0
 Item {
     id: mapWindow
 
-    // Km/h
-    property int carSpeed: 70
-    property bool navigating: false
-    property bool zoomstate: false
-
+    property int disOffset: 70
     property real rotateAngle: 0
-    property var startPoint: QtPositioning.coordinate(36.12546,-115.173)
-    property var endPoint: QtPositioning.coordinate(36.0659063, -115.1800443)
+    property var startPoint
+    property var endPoint
 
-    states: [
-        State {
-            name: ""
-            PropertyChanges { target: map; tilt: 0; bearing: 0; zoomLevel: map.zoomLevel }
-        },
-        State {
-            name: "navigating"
-            PropertyChanges { target: map; tilt: 60; zoomLevel: 20 }
-        }
-    ]
-
-    transitions: [
-        Transition {
-            to: "*"
-            RotationAnimation { target: map; property: "bearing"; duration: 100; direction: RotationAnimation.Shortest }
-            NumberAnimation { target: map; property: "zoomLevel"; duration: 100 }
-            NumberAnimation { target: map; property: "tilt"; duration: 100 }
-        }
-    ]
-
-    state: navigating ? "navigating" : ""
-
-    // Direction board
-    Image {
-        id: backgroudBoard
-
-        anchors.fill: parent
-        visible: map.showBoard
-        source: "qrc:simple-bottom-background-black.png"
+    //turn by turn board view
+    TbtBoard {
+        id: tbt_board
         z: 1
+        visible: false
+        anchors.fill: parent
     }
 
-    Image {
-        id: turnDirectionBoard
-
-        anchors.bottom: distanceBoard.top
-        visible: map.showDirection
-        width : parent.height - turnInstructionsBoard.height - distanceBoard.height
-        height: parent.height - turnInstructionsBoard.height - distanceBoard.height
-        z: 3
-    }
-
-    CustomLabel {
-        id: distanceBoard
-
-        anchors.bottom: turnInstructionsBoard.top
-        z: 3
-        visible: map.showDirection
-        font.pixelSize: 45
-        color: "#FFFFFF"
-        width:backgroudBoard.width
-        horizontalAlignment: Text.AlignHCenter
-    }
-
-    CustomLabel {
-        id: turnInstructionsBoard
-
-        anchors.bottom: parent.bottom
-        z: 3
-        visible: map.showDirection
-        font.pixelSize: 30
-        color: "#FFFFFF"
-        width:backgroudBoard.width
-        horizontalAlignment: Text.AlignHCenter
-        wrapMode: Text.Wrap
-    }
-
-    CustomLabel {
-        id: naviDoneBoard
-
-        anchors.bottom: parent.bottom
-        z: 3
-        visible: map.showNaviDone
-        font.pixelSize: 38
-        color: "#FFFFFF"
-        text: "Arrive destination.Auto Navi will restart in 5 seconds."
-    }
-
+    //mapview and route views
     Map {
         id: map
         anchors.fill: parent
-
-        property bool showBoard: false
-        property bool showDirection: false
-        property bool showNaviDone: false
 
         plugin: Plugin {
             name: "mapboxgl"
@@ -126,29 +49,11 @@ Item {
             }
         }
 
-        center: (mapWindow.navigating && !mapWindow.zoomstate) ? ruler.currentPosition : startPoint
-        zoomLevel: 12
-        minimumZoomLevel: 0
-        maximumZoomLevel: 20
-        tilt: 0
-
+        center: ruler.currentPosition
+        zoomLevel: 20
+        tilt: 60
+        gesture.acceptedGestures:MapGestureArea.NoGesture
         copyrightsVisible: false
-
-        MouseArea {
-            anchors.fill: parent
-
-            onWheel: {
-                mapWindow.zoomstate = true
-                wheel.accepted = false
-            }
-        }
-        gesture.onPanStarted: {
-            mapWindow.zoomstate = true
-        }
-
-        gesture.onPinchStarted: {
-            mapWindow.zoomstate = true
-        }
 
         RotationAnimation on bearing {
             id: bearingAnimation
@@ -156,7 +61,7 @@ Item {
             duration: 250
             alwaysRunToEnd: false
             direction: RotationAnimation.Shortest
-            running: mapWindow.navigating
+            running: true
         }
 
         Location {
@@ -165,19 +70,13 @@ Item {
         }
 
         onCenterChanged: {
-            if (previousLocation.coordinate === center || !mapWindow.navigating)
+            if (previousLocation.coordinate === center)
                 return;
 
             bearingAnimation.to = previousLocation.coordinate.azimuthTo(center);
             bearingAnimation.start();
 
             previousLocation.coordinate = center;
-        }
-
-        function updateRoute() {
-            routeQuery.clearWaypoints();
-            routeQuery.addWaypoint(startMarker.coordinate);
-            routeQuery.addWaypoint(endMarker.coordinate);
         }
 
         MapQuickItem {
@@ -187,19 +86,8 @@ Item {
                 id: greenMarker
                 source: "qrc:///marker-green.png"
             }
-
-            coordinate : startPoint
             anchorPoint.x: greenMarker.width / 2
             anchorPoint.y: greenMarker.height / 2
-
-            MouseArea  {
-                drag.target: parent
-                anchors.fill: parent
-
-                onReleased: {
-                    map.updateRoute();
-                }
-            }
         }
 
         MapQuickItem {
@@ -209,19 +97,8 @@ Item {
                 id: redMarker
                 source: "qrc:///marker-end.png"
             }
-
-            coordinate : endPoint
             anchorPoint.x: redMarker.width / 2
             anchorPoint.y: redMarker.height / 2
-
-            MouseArea  {
-                drag.target: parent
-                anchors.fill: parent
-
-                onReleased: {
-                    map.updateRoute();
-                }
-            }
         }
 
         MapItemView {
@@ -244,7 +121,7 @@ Item {
 
             sourceItem: Image {
                 id: carMarker
-                source: "qrc:///car-marker2.png"
+                source: "qrc:///car-marker.png"
                 transform: Rotation {
                                 origin.x: carMarker.width / 2;
                                 origin.y: carMarker.height / 2;
@@ -269,132 +146,76 @@ Item {
             }
         }
 
+        //add route view in the map
+        function updateRoute() {
+            routeQuery.clearWaypoints();
+            routeQuery.addWaypoint(startMarker.coordinate);
+            routeQuery.addWaypoint(endMarker.coordinate);
+            map.addMapItem(startMarker)
+            map.addMapItem(endMarker)
+        }
+
+        //clear route view in the map
+        function clearRoute() {
+            routeQuery.clearWaypoints();
+            routeModel.reset();
+            map.removeMapItem(startMarker)
+            map.removeMapItem(endMarker)
+        }
+
         CheapRuler {
             id: ruler
 
-            onArrivedDest:
-            {
-                map.showBoard = true;
-                map.showDirection = false;
-                map.showNaviDone = true;
-                restartnaviDemo.start()
-            }
-
             onCurrentDistanceChanged: {
                 var total = 0;
-                var total2 = 0;
                 var i = 0;
-                var j = 0;
-                var alltime = routeModel.get(0).travelTime;
-                var alldistance = ruler.distance*1000;
+                var alldistance = ruler.distance * 1000;
 
-                // XXX: Use car speed in meters to pre-warn the turn instruction
-                while (total - mapWindow.carSpeed < ruler.currentDistance * 1000 && i < routeModel.get(0).segments.length)
+                if((routeModel.status === RouteModel.Ready)
+                && (routeModel.count === 1))
                 {
-                    total += routeModel.get(0).segments[i++].maneuver.distanceToNextInstruction;
-                }
+                    // XXX: Use car speed in meters to pre-warn the turn instruction
+                    while (total < ruler.currentDistance && i < routeModel.get(0).segments.length)
+                    {
+                        total += routeModel.get(0).segments[i++].maneuver.distanceToNextInstruction;
+                    }
 
-                if(i >= routeModel.get(0).segments.length)
-                {
-                    total = alldistance;
-                }
+                    //show the tbt board(it will be always show when demo start)
+                    tbt_board.visible = true
 
-                while (total2 < ruler.currentDistance * 1000 && j < routeModel.get(0).segments.length)
-                {
-                    total2 += routeModel.get(0).segments[j++].maneuver.distanceToNextInstruction;
-                }
+                     // Set turn instruction
+                    tbt_board.do_setTurnInstructions(routeModel.get(0).segments[i].maneuver.instructionText)
+                    tbt_board.state = routeModel.get(0).segments[i].maneuver.direction
 
-                if(j >= routeModel.get(0).segments.length)
-                {
-                    total2 = alldistance;
-                }
+                    //when goto the last instruction,set the states to "arriveDest"
+                    if(i >= (routeModel.get(0).segments.length-1))
+                    {
+                        total = alldistance;
+                        tbt_board.state = "arriveDest";
+                    }
 
-                var dis = (total2 - ruler.currentDistance * 1000).toFixed(1);
+                    var dis = (total - ruler.currentDistance).toFixed(1);
 
-                 // Set board status
-                if(dis < mapWindow.carSpeed && i < routeModel.get(0).segments.length)
-                {
-                    map.showBoard = true;
-                    map.showDirection = true;
-                    map.showNaviDone = false;
-                }
-                else
-                {
-                    map.showBoard = false;
-                    map.showDirection = false;
-                    map.showNaviDone = false;
-                }
+                    // Set distance
+                    tbt_board.do_setDistance(dis)
 
-                // Set distance
-                if(dis > 1000)
-                {
-                    distanceBoard.text = (dis / 1000).toFixed(1) + " km";
-                }
-                else
-                {
-                    distanceBoard.text = dis + " m";
-                }
-
-                // Set traval time
-                var travaltimesec=((1 - (ruler.currentDistance * 1000)/alldistance)*alltime).toFixed(0);
-
-                if((travaltimesec/3600)>=1)
-                {
-                    travaltime.text = (travaltimesec/3600).toFixed(0) + "h" + ((travaltimesec%3600)/60).toFixed(0) + "min";
-                }
-                else
-                {
-                    travaltime.text = (travaltimesec/60).toFixed(0) + "min";
-                }
-
-                // Set turn instruction
-                turnInstructionsBoard.text = routeModel.get(0).segments[i - 1].maneuver.instructionText;
-
-                // Set turn direction
-                if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionForward)
-                {
-                }
-                else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionLightRight)
-                {
-                    turnDirectionBoard.source = "qrc:arrow-r-30-full.png";
-                }
-                else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionRight)
-                {
-                    turnDirectionBoard.source = "qrc:arrow-r-45-full.png";
-                }
-                else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionHardRight)
-                {
-                    turnDirectionBoard.source = "qrc:arrow-r-75-full.png";
-                }
-                else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionUTurnRight)
-                {
-                    //TODO modify qtlocation U-Turn best.For test, change app source.
-                    turnDirectionBoard.source = "qrc:arrow-l-180-full.png";
-                }
-                else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionLightLeft)
-                {
-                    turnDirectionBoard.source = "qrc:arrow-l-30-full.png";
-                }
-                else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionLeft)
-                {
-                    turnDirectionBoard.source = "qrc:arrow-l-45-full.png";
-                }
-                else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionHardLeft)
-                {
-                    turnDirectionBoard.source = "qrc:arrow-l-75-full.png";
-                }
-                else if(routeModel.get(0).segments[i - 1].maneuver.direction === RouteManeuver.DirectionUTurnLeft)
-                {
-                    //TODO modify qtlocation U-Turn best.For test, change app source.
-                    turnDirectionBoard.source = "qrc:arrow-r-180-full.png";
-                }
-                else
-                {
+                     // Set board status
+                    if(dis < mapWindow.disOffset && i < routeModel.get(0).segments.length)
+                    {
+                        //show the tbt board(the big one)
+                        tbt_board.do_showTbtboard(true)
+                     }
+                    else
+                    {
+                        //disvisible the tbt board(the big one)
+                        tbt_board.do_showTbtboard(false)
+                    }
                 }
             }
         }
     }
 
+    //the route view display by RouteModel
     RouteModel {
         id: routeModel
 
@@ -410,147 +231,51 @@ Item {
                 value: "pk.eyJ1IjoicXRzZGsiLCJhIjoiY2l5azV5MHh5MDAwdTMybzBybjUzZnhxYSJ9.9rfbeqPjX2BusLRDXHCOBA"
             }
         }
-
-        Component.onCompleted: {
-            if (map) {
-                map.updateRoute();
-            }
-        }
     }
 
     RouteQuery {
         id: routeQuery
     }
 
-    Image {
-        id: bottombackgroud
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-        width:parent.width
-        height: 100
-        visible: mapWindow.navigating && !map.showBoard && !map.showDirection && !map.showNaviDone
-        source: "qrc:simple-bottom-background-white.png"
-        z: 1
-    }
-
-    Image {
-        id: carCurrent
-        anchors.left: bottombackgroud.left
-        anchors.verticalCenter: bottombackgroud.verticalCenter
-        z: 3
-
-        visible: !(mapWindow.navigating && !mapWindow.zoomstate)
-        source: "qrc:car-focus.png"
-
-        MouseArea {
-            id: area
-
-            anchors.fill: parent
-
-            onClicked: {
-                mapWindow.zoomstate = false
-                do_startnavidemo()
-            }
-        }
-
-        scale: area.pressed ? 0.85 : 1.0
-
-        Behavior on scale {
-            NumberAnimation {}
+    Component.onCompleted: {
+        //request the route info when map load finish
+        if (ruler) {
+            ruler.initRouteInfo();
         }
     }
 
-    CustomLabel {
-        id: travaltime
-        anchors.left: carCurrent.right
-        anchors.verticalCenter: bottombackgroud.verticalCenter
-        visible: mapWindow.navigating && !map.showBoard && !map.showDirection && !map.showNaviDone 
-        z: 3
-        font.pixelSize: 38
-    }
-
-    Row {
-        anchors.horizontalCenter: bottombackgroud.horizontalCenter
-        anchors.verticalCenter: bottombackgroud.verticalCenter
-        visible: mapWindow.navigating && !map.showBoard && !map.showDirection && !map.showNaviDone
-        spacing: 10
-        z:3
-        DateAndTime {}
-    }
-
-
-    Image {
-        id: stopdemo
-        anchors.right: parent.right
-        anchors.bottom:parent.bottom
-        z: 3
-
-        visible: mapWindow.navigating && !map.showBoard && !map.showDirection && !map.showNaviDone
-        source: "qrc:car-marker.png"
-
-        MouseArea {
-            anchors.fill: parent
-
-            onClicked: {
-                do_stopnavidemo();
-            }
-
-            onReleased: {
-                map.updateRoute();
-            }
-        }
-    }
-
-    Timer {
-        id: naviTimer
-        repeat: false
-        interval: 5000
-        triggeredOnStart: false
-        onTriggered: {
-            console.log("onTriggered")
-            do_startnavidemo()
-            mapWindow.zoomstate = false
-
-        }
-    }
-
-    Timer {
-        id: restartnaviDemo
-        repeat: false
-        interval: 5000
-        triggeredOnStart: false
-        onTriggered: {
-            console.log("onTriggered")
-            do_stopnavidemo()
+    //the functions can be called by outside
+    //add route signal function
+    function do_addRoutePoint(poi_Lat_s, poi_Lon_s, poi_Lat_e, poi_Lon_e) {
+        //set the startPoint and endPoint
+        startPoint= QtPositioning.coordinate(poi_Lat_s,poi_Lon_s);
+        endPoint = QtPositioning.coordinate(poi_Lat_e,poi_Lon_e);
+        startMarker.coordinate = startPoint;
+        endMarker.coordinate = endPoint;
+        //update the route view
+        if (map) {
             map.updateRoute();
-            mapWindow.zoomstate = false
-            do_startnavidemo()
         }
     }
 
-    function do_setCoordinate(latitude,longitude) {
-        ruler.setCurrentCoordinate(latitude,longitude);
+    //set the current position
+    function do_setCoordinate(latitude,longitude,direction,distance) {
+        ruler.setCurrentPosition(latitude, longitude, distance);
     }
 
-    function do_startnavidemo() {
-        if(mapWindow.navigating == false)
-        {
-            ruler.startnaviDemo()
-            mapWindow.navigating = true
-        }
-    }
-
+    //stop navidemo signal
     function do_stopnavidemo() {
-        if(mapWindow.navigating == true)
-        {
-            ruler.stopnaviDemo()
-            mapWindow.navigating = false
-        	ruler.setCurrentCoordinate("36.12546","-115.173");
+        //disvisible the tbt board
+        tbt_board.visible = false
+        //clear the routeview
+        if (map) {
+            map.clearRoute();
         }
     }
 
-    function do_autostart() {
-        console.log("naviTimer start")
-        naviTimer.start()
+    //arrvice the destination signal
+    function do_arrivedest(){
+        //disvisible the tbt board
+        tbt_board.visible = false
     }
 }

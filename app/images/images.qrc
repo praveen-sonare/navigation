@@ -1,22 +1,17 @@
 <RCC>
     <qresource prefix="/">
-        <file>car-focus.png</file>
         <file>car-marker.png</file>
-		<file>car-marker2.png</file>
         <file>marker-green.png</file>
-        <file>marker-red.png</file>
-		<file>marker-end.png</file>
-        <file>simple-bottom-background-white.png</file>
+        <file>marker-end.png</file>
         <file>simple-bottom-background-black.png</file>
-        <file>arrow-0.png</file>
-        <file>arrow-l-30.png</file>
-        <file>arrow-l-45.png</file>
-        <file>arrow-l-75.png</file>
-        <file>arrow-l-180.png</file>
-        <file>arrow-r-30.png</file>
-        <file>arrow-r-45.png</file>
-        <file>arrow-r-75.png</file>
-        <file>arrow-r-180.png</file>
+        <file>arrow-l-30-full.png</file>
+        <file>arrow-l-45-full.png</file>
+        <file>arrow-l-75-full.png</file>
+        <file>arrow-l-180-full.png</file>
+        <file>arrow-r-30-full.png</file>
+        <file>arrow-r-45-full.png</file>
+        <file>arrow-r-75-full.png</file>
+        <file>arrow-r-180-full.png</file>
         <file>arrow-0-large.png</file>
         <file>arrow-l-30-large.png</file>
         <file>arrow-l-45-large.png</file>
@@ -26,13 +21,8 @@
         <file>arrow-r-45-large.png</file>
         <file>arrow-r-75-large.png</file>
         <file>arrow-r-180-large.png</file>
-        <file>arrow-l-30-full.png</file>
-        <file>arrow-l-45-full.png</file>
-        <file>arrow-l-75-full.png</file>
-        <file>arrow-l-180-full.png</file>
-        <file>arrow-r-30-full.png</file>
-        <file>arrow-r-45-full.png</file>
-        <file>arrow-r-75-full.png</file>
-        <file>arrow-r-180-full.png</file>
+        <file>simple-background-white.png</file>
+        <file>destination.png</file>
+        <file>destination_full.png</file>
     </qresource>
 </RCC>
