@@ -1,30 +1,29 @@
-TARGET = tbtnavi
-TEMPLATE = app
+TARGET = navigation
+QT = quick qml
 
-QT += qml network quick positioning location sql widgets
+QT += aglextras
+PKGCONFIG += qlibhomescreen qlibwindowmanager
 
-CONFIG += c++14
-
-include(app.pri)
-
-ios|android {
-    QT -= widgets
-}
-
-SOURCES += \
-    main.cpp \
-    qcheapruler.cpp
+QT += positioning
+QT += dbus
+QT += core
+CONFIG += c++11 link_pkgconfig
 
 HEADERS += \
-    qcheapruler.hpp
+    markermodel.h \
+    dbus_server.h \
+    guidance_module.h \
+    file_operation.h
 
-INCLUDEPATH += \
-    ../include
-
-OTHER_FILES += \
-    qmapboxlgapp.qml
+SOURCES += main.cpp \
+    dbus_server.cpp
 
 RESOURCES += \
-    images/images.qrc \
-    app.qrc
+    navigation.qrc \
+    images/images.qrc
+
+DBUS_ADAPTORS += dbusinterface/org.agl.naviapi.xml
+DBUS_INTERFACES += dbusinterface/org.agl.naviapi.xml
+
+include(app.pri)
 

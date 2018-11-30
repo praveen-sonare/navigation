@@ -1,0 +1,6 @@
+#!/bin/sh
+TMP=/tmp/navi.wav
+echo "$1" | open_jtalk -ow $TMP -m /usr/share/Voice/mei/mei_normal.htsvoice -x /usr/share/dic/
+4a-play $TMP hw:0,0,3 navigation
+
+
