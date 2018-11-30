@@ -7,11 +7,11 @@ Item {
 		width: 100
 		height: 100
 
-		function doSomething() {
-			// ...
+        function zoomDown() {
+            map.zoomLevel -= 1
 		}
 
-		onClicked: { doSomething() }
+        onClicked: { zoomDown() }
 
 		Image {
 			id: image
@@ -19,7 +19,7 @@ Item {
 			height: 92
 			anchors.verticalCenter: parent.verticalCenter
 			anchors.horizontalCenter: parent.horizontalCenter
-			source: "images/Shrink_button.bmp"
+            source: "images/240px-Antu_file-zoom-out.svg.png"
 		}
 	}
 }

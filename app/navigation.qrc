@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>navigation.qml</file>
+        <file>BtnMapDirection.qml</file>
+        <file>BtnShrink.qml</file>
+        <file>BtnEnlarge.qml</file>
+        <file>ImgDestinationDirection.qml</file>
+        <file>ProgressNextCross.qml</file>
+        <file>BtnGuidance.qml</file>
+        <file>BtnPresentPosition.qml</file>
+    </qresource>
+</RCC>

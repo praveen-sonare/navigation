@@ -1,0 +1,5 @@
+#!/bin/sh
+TMP=/tmp/navi.wav
+echo "$1" | flite_hts_engine -m  /usr/share/Voice/us/cmu_us_arctic_slt.htsvoice -o $TMP
+4a-play $TMP hw:0,0,3 navigation
+

@@ -2,24 +2,39 @@ import QtQuick 2.0
 import QtQuick.Controls 1.5
 
 Item {
-	Button {
-		id: btn_present_position
+    id: btn_present_position
+
+    Button {
+        id: btn_present_position_
 		width: 100
 		height: 100
+        visible: false
 
-		function doSomething() {
-			// ...
-		}
+        function present_position_clicked() {
+            map.center = map.currentpostion
+//            map.zoomLevel = root.default_zoom_level
+            btn_present_position.state = "Flowing"
+        }
+        onClicked: { present_position_clicked() }
 
-		onClicked: { doSomething() }
+        Image {
+            id: image_present_position
+            width: 48
+            height: 92
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+            source: "images/207px-Car_icon_top.svg.png"
+        }
+    }
+    states: [
+        State{
+            name: "Flowing"
+            PropertyChanges { target: btn_present_position_; visible: false }
+        },
+        State{
+            name: "Optional"
+            PropertyChanges { target: btn_present_position_; visible: true }
+        }
+    ]
 
-		Image {
-			id: image
-			width: 92
-			height: 92
-			anchors.verticalCenter: parent.verticalCenter
-			anchors.horizontalCenter: parent.horizontalCenter
-			source: "images/thum500_t002_0_ip_0175.jpg"
-		}
-	}
 }

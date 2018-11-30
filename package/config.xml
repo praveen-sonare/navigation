@@ -3,7 +3,7 @@
   <name>navigation</name>
   <icon src="icon.svg"/>
   <content src="bin/navigation" type="application/vnd.agl.native"/>
-  <description>This is a demo testqt application</description>
+  <description>This is a demo navigation application</description>
   <author>Qt</author>
   <license>APL 2.0</license>
   <feature name="urn:AGL:widget:required-api">
@@ -12,6 +12,7 @@
   </feature>
   <feature name="urn:AGL:widget:required-permission">
     <param name="urn:AGL:permission::public:no-htdocs" value="required"/>
+    <param name="http://tizen.org/privilege/internal/dbus" value="required"/>
   </feature>
 </widget>
 

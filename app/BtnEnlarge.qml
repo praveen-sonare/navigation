@@ -3,15 +3,14 @@ import QtQuick.Controls 1.5
 
 Item {
 	Button {
-		id: btn_enlarge
 		width: 100
 		height: 100
 
-		function doSomething() {
-			// ...
+        function zoomUp() {
+            map.zoomLevel += 1
 		}
 
-		onClicked: { doSomething() }
+        onClicked: { zoomUp() }
 
 		Image {
 			id: image
@@ -19,7 +18,7 @@ Item {
 			height: 92
 			anchors.verticalCenter: parent.verticalCenter
 			anchors.horizontalCenter: parent.horizontalCenter
-			source: "images/Enlarge_button.bmp"
+            source: "images/240px-Antu_kdenlive-zoom-large.svg.png"
 		}
 	}
 }

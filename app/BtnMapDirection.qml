@@ -2,18 +2,23 @@ import QtQuick 2.0
 import QtQuick.Controls 1.5
 
 Item {
-	Button {
+    Button {
 		id: btn_map_direction
 		width: 100
 		height: 100
 
 		function settleState() {
-			if(btn_map_direction.state == "HeadingUp"){
-				btn_map_direction.state = "NorthUp";
+            if(root.st_heading_up){
+                btn_map_direction.state = "NorthUp"
+                car_position_mapitem.state = "NorthUp"
+                root.st_heading_up = false
 			} else {
-				btn_map_direction.state = "HeadingUp";
+                btn_map_direction.state = "HeadingUp"
+                car_position_mapitem.state = "HeadingUp"
+                root.st_heading_up = true
 			}
-		}
+            map.rotateMapSmooth()
+        }
 
 		onClicked: { settleState() }
 
@@ -23,18 +28,18 @@ Item {
 			height: 92
 			anchors.verticalCenter: parent.verticalCenter
 			anchors.horizontalCenter: parent.horizontalCenter
-			source: "images/Direction_Hup.jpeg"
+            source: "images/202px-Compass-icon_bb_N.svg.png"
 		}
 
 		states: [
 			State {
 				name: "HeadingUp"
-				PropertyChanges { target: image; source: "images/Direction_Hup.jpeg" }
+                PropertyChanges { target: image; source: "images/240px-Compass_icon_NE.svg.png" }
 			},
 			State {
 				name: "NorthUp"
-				PropertyChanges { target: image; source: "images/Direction_Nup.jpeg" }
-			}
+                PropertyChanges { target: image; source: "images/202px-Compass-icon_bb_N.svg.png" }
+            }
 		]
-	}
+    }
 }
