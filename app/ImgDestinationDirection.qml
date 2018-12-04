@@ -22,8 +22,8 @@ Item {
 	states: [
         State {
             name: "0" // NoDirection
-            PropertyChanges { target: img_destination_direction; visible: true }
-            PropertyChanges { target: direction; source: "images/SW_Patern_3.bmp" }
+            PropertyChanges { target: img_destination_direction; visible: false }
+//            PropertyChanges { target: direction; source: "images/SW_Patern_3.bmp" }
         },
         State {
             name: "1" // DirectionForward
@@ -53,9 +53,9 @@ Item {
 		State {
             name: "6" // DirectionUTurnRight
             PropertyChanges { target: img_destination_direction; visible: true }
-          //PropertyChanges { target: direction; source: "images/1_uturn.png" }
-            PropertyChanges { target: direction; source: "images/9_7_uturn_left.png" }	// no u-turn right in CES2019
-		},
+//            PropertyChanges { target: direction; source: "images/1_uturn.png" }
+            PropertyChanges { target: direction; source: "images/7_left.png" } // No u-turn right in CES2019
+        },
 		State {
             name: "7" // DirectionUTurnLeft
             PropertyChanges { target: img_destination_direction; visible: true }

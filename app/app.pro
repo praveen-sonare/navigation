@@ -16,7 +16,8 @@ HEADERS += \
     file_operation.h
 
 SOURCES += main.cpp \
-    dbus_server.cpp
+    dbus_server.cpp \
+    file_operation.cpp
 
 RESOURCES += \
     navigation.qrc \
