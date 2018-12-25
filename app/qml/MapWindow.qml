@@ -40,7 +40,7 @@ Item {
 
             PluginParameter {
                 name: "mapboxgl.access_token"
-                value: "pk.eyJ1IjoidG1wc2FudG9zIiwiYSI6ImNqMWVzZWthbDAwMGIyd3M3ZDR0aXl3cnkifQ.FNxMeWCZgmujeiHjl44G9Q"
+                value: "pk.eyJ1IjoiaW5zZXJ0MDAwMyIsImEiOiJjam94dTFzanYyNWFpM3ZrZmp4bXhlcDh6In0.2aQLdVtA5LsHgSQiarz7vw"
             }
 
             PluginParameter {
@@ -228,7 +228,7 @@ Item {
             // Development access token, do not use in production.
             PluginParameter {
                 name: "mapbox.access_token"
-                value: "pk.eyJ1IjoicXRzZGsiLCJhIjoiY2l5azV5MHh5MDAwdTMybzBybjUzZnhxYSJ9.9rfbeqPjX2BusLRDXHCOBA"
+                value: "pk.eyJ1IjoiaW5zZXJ0MDAwMyIsImEiOiJjam94dTFzanYyNWFpM3ZrZmp4bXhlcDh6In0.2aQLdVtA5LsHgSQiarz7vw"
             }
         }
     }
