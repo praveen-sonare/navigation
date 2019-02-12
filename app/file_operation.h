@@ -101,7 +101,7 @@ public:
     }
     
     Q_INVOKABLE double getLatitude() {
-    	double latitude = 36.136261;
+    	double latitude = 35.692396;
     	QFile file(MAP_ACCESS_TOKEN_FILEPATH);
     	if (!file.open(QIODevice::ReadOnly)){
             fprintf(stderr,"Failed to open mapAccessToken file \"%s\": %m", qPrintable(MAP_ACCESS_TOKEN_FILEPATH));
@@ -121,7 +121,7 @@ public:
     }
     
      Q_INVOKABLE double getLongitude() {
-    	double longitute = -115.151254;
+    	double longitute = 139.691102;
     	QFile file(MAP_ACCESS_TOKEN_FILEPATH);
     	if (!file.open(QIODevice::ReadOnly)){
             fprintf(stderr,"Failed to open mapAccessToken file \"%s\": %m", qPrintable(MAP_ACCESS_TOKEN_FILEPATH));
