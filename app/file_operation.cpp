@@ -13,8 +13,8 @@ void File_Operation::initFileOperation(){
     m_mapAccessToken = "";
     m_car_speed = 60; // set default Km/h
     m_update_interval = 100; // set default millisecond
-    m_start_latitude = 36.136261; // set default coordinate Westgate
-    m_start_longitute = -115.151254;
+    m_start_latitude = 35.692396; // set default coordinate Westgate
+    m_start_longitute = 139.691102;
 
     QFile file(MAP_ACCESS_TOKEN_FILEPATH);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){

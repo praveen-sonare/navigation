@@ -121,15 +121,15 @@ ApplicationWindow {
             id: poi
             sourceItem: Rectangle { width: 14; height: 14; color: "#e41e25"; border.width: 2; border.color: "white"; smooth: true; radius: 7 }
             coordinate {
-                latitude: 36.136261
-                longitude: -115.151254
+                latitude: 35.692396
+                longitude: 139.691102
             }
             opacity: 1.0
             anchorPoint: Qt.point(sourceItem.width/2, sourceItem.height/2)
         }
         MapQuickItem {
             sourceItem: Text{
-                text: "Westgate"
+                text: "Hilton Tokyo"
                 color:"#242424"
                 font.bold: true
                 styleColor: "#ECECEC"
