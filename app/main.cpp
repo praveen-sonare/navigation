@@ -1,80 +1,81 @@
-/****************************************************************************
-**
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
-**
-** This file is part of the examples of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of The Qt Company Ltd nor the names of its
-**     contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
+/*
+ * Copyright (C) 2016 The Qt Company Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+#ifdef DESKTOP
+#define USE_QTAGLEXTRAS			0
+#define USE_QLIBWINDOWMANAGER	0
+#else
+#define USE_QTAGLEXTRAS			0
+#define USE_QLIBWINDOWMANAGER	1
+#endif
+
+#if	USE_QTAGLEXTRAS
+#include <QtAGLExtras/AGLApplication>
+#elif USE_QLIBWINDOWMANAGER
+#include <qlibwindowmanager.h>
+#include <qlibhomescreen.h>
+#include <string>
+#endif
+#include <QtCore/QDebug>
 #include <QtCore/QCommandLineParser>
-#include <QtCore/QTextStream>
+#include <QtCore/QUrlQuery>
+#include <QtCore/QSettings>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
-#include <QtQuick/QQuickItem>
-#include <QtCore/QUrlQuery>
 #include <QtQml/QQmlContext>
-#include <QtQml/qqml.h>
 #include <QtQuickControls2/QQuickStyle>
 #include <QQuickWindow>
-#include <libhomescreen.hpp>
-#include <qlibwindowmanager.h>
+#include <QtDBus/QDBusConnection>
+#include "markermodel.h"
+#include "guidance_module.h"
+#include "file_operation.h"
 
 int main(int argc, char *argv[])
-{
+{	
+#if	USE_QTAGLEXTRAS
+	AGLApplication app(argc, argv);
+	app.setApplicationName("navigation");
+	app.setupApplicationRole("navigation");
+ 	app.load(QUrl(QStringLiteral("qrc:/navigation.qml")));
+	
+#elif USE_QLIBWINDOWMANAGER
+	QGuiApplication app(argc, argv);
+	QString myname = QString("navigation");
 
-    QString myname = QString("Navigation");
-
-    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
-    QGuiApplication app(argc, argv);
-
-    QQuickStyle::setStyle("AGL");
     QQmlApplicationEngine engine;
     QQmlContext *context = engine.rootContext();
+    QUrl bindingAddress;
+    int port = 0;
+    QString secret;
 
-    QCommandLineParser parser;
-    parser.addPositionalArgument("port", app.translate("main", "port for binding"));
-    parser.addPositionalArgument("secret", app.translate("main", "secret for binding"));
-    parser.addHelpOption();
-    parser.addVersionOption();
-    parser.process(app);
+	QCoreApplication::setOrganizationDomain("LinuxFoundation");
+	QCoreApplication::setOrganizationName("AutomotiveGradeLinux");
+	QCoreApplication::setApplicationName(myname);
+	QCoreApplication::setApplicationVersion("0.1.0");
+	QCommandLineParser parser;
+	parser.addPositionalArgument("port", app.translate("main", "port for binding"));
+	parser.addPositionalArgument("secret", app.translate("main", "secret for binding"));
+	parser.addHelpOption();
+	parser.addVersionOption();
+	parser.process(app);
+
     QStringList positionalArguments = parser.positionalArguments();
-
     if (positionalArguments.length() == 2) {
-        int port = positionalArguments.takeFirst().toInt();
-        QString secret = positionalArguments.takeFirst();
-        QUrl bindingAddress;
+        port = positionalArguments.takeFirst().toInt();
+        secret = positionalArguments.takeFirst();
         bindingAddress.setScheme(QStringLiteral("ws"));
         bindingAddress.setHost(QStringLiteral("localhost"));
         bindingAddress.setPort(port);
@@ -83,54 +84,76 @@ int main(int argc, char *argv[])
         query.addQueryItem(QStringLiteral("token"), secret);
         bindingAddress.setQuery(query);
         context->setContextProperty(QStringLiteral("bindingAddress"), bindingAddress);
-        std::string token = secret.toStdString();
-        LibHomeScreen* hs = new LibHomeScreen();
-        QLibWindowmanager* qwm = new QLibWindowmanager();
-
-        // WindowManager
-        if(qwm->init(port,secret) != 0){
-            exit(EXIT_FAILURE);
-        }
-        // Request a surface as described in layers.json windowmanager’s file
-        if (qwm->requestSurface(myname) != 0) {
-            exit(EXIT_FAILURE);
-        }
-        // Create an event callback against an event type. Here a lambda is called when SyncDraw event occurs
-        qwm->set_event_handler(QLibWindowmanager::Event_SyncDraw, [qwm, myname](json_object *object) {
-            fprintf(stderr, "Surface got syncDraw!\n");
-            qwm->endDraw(myname);
-        });
-
-        // HomeScreen
-        hs->init(port, token.c_str());
-        // Set the event handler for Event_TapShortcut which will activate the surface for windowmanager
-        hs->set_event_handler(LibHomeScreen::Event_TapShortcut, [qwm, myname](json_object *object){
-            json_object *appnameJ = nullptr;
-            if(json_object_object_get_ex(object, "application_name", &appnameJ))
-            {
-                const char *appname = json_object_get_string(appnameJ);
-                if(myname == appname)
-                {
-                    qDebug("Surface %s got tapShortcut\n", appname);
-                    qwm->activateSurface(myname);
-                }
-            }
-        });
-
-        QVariantMap parameters;
-        parameters[QStringLiteral("osm.useragent")] = QStringLiteral("Automotive Grade Linux Navigation");
-
-        engine.addImportPath(QStringLiteral(":/imports"));
-        engine.load(QUrl(QStringLiteral("qrc:/mapviewer.qml")));
-        QObject::connect(&engine, SIGNAL(quit()), qApp, SLOT(quit()));
-
-        QObject *root = engine.rootObjects().first();
-        QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
-        QObject::connect(window, SIGNAL(frameSwapped()), qwm, SLOT(slotActivateSurface()));
-
-        QMetaObject::invokeMethod(root, "initializeProviders",
-                                  Q_ARG(QVariant, QVariant::fromValue(parameters)));
+    } else {
+        context->setContextProperty(QStringLiteral("bindingAddress"), bindingAddress);
     }
 
-    return app.exec();
+    fprintf(stderr, "[navigation]app_name: %s, port: %d, secret: %s.\n",
+					myname.toStdString().c_str(),
+					port,
+                    secret.toStdString().c_str());
+	// QLibWM
+	QLibWindowmanager* qwmHandler = new QLibWindowmanager();
+	int res;
+    if((res = qwmHandler->init(port,secret)) != 0){
+		fprintf(stderr, "[navigation]init qlibwm err(%d)\n", res);
+		return -1;
+	}
+	if((res = qwmHandler->requestSurface(myname)) != 0) {
+		fprintf(stderr, "[navigation]request surface err(%d)\n", res);
+		return -1;
+	}
+    qwmHandler->set_event_handler(QLibWindowmanager::Event_SyncDraw, [qwmHandler, myname](json_object *object) {
+		qwmHandler->endDraw(myname);
+	});
+    qwmHandler->set_event_handler(QLibWindowmanager::Event_Visible, [qwmHandler, myname](json_object *object) {
+        ;
+    });
+    qwmHandler->set_event_handler(QLibWindowmanager::Event_Invisible, [qwmHandler, myname](json_object *object) {
+        ;
+    });
+	// QLibHS
+	QLibHomeScreen* qhsHandler = new QLibHomeScreen();
+    qhsHandler->init(port, secret.toStdString().c_str());
+	qhsHandler->set_event_handler(QLibHomeScreen::Event_TapShortcut, [qwmHandler, myname](json_object *object){
+        qDebug("Surface %s got tapShortcut\n", myname);
+        qwmHandler->activateWindow(myname);
+	});
+	// Load qml
+
+    MarkerModel model;
+	engine.rootContext()->setContextProperty("markerModel", &model);
+
+    Guidance_Module guidance;
+	engine.rootContext()->setContextProperty("guidanceModule", &guidance);
+
+    File_Operation file;
+    engine.rootContext()->setContextProperty("fileOperation", &file);
+
+	engine.load(QUrl(QStringLiteral("qrc:/navigation.qml")));
+ 	QObject *root = engine.rootObjects().first();
+	QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
+    qhsHandler->setQuickWindow(window);
+
+#else	// for only libwindowmanager
+	QGuiApplication app(argc, argv);
+    app.setApplicationName("navigation");
+
+	// Load qml
+	QQmlApplicationEngine engine;
+
+    MarkerModel model;
+    engine.rootContext()->setContextProperty("markerModel", &model);
+
+    Guidance_Module guidance;
+    engine.rootContext()->setContextProperty("guidanceModule", &guidance);
+
+    File_Operation file;
+    engine.rootContext()->setContextProperty("fileOperation", &file);
+
+    engine.load(QUrl(QStringLiteral("qrc:/navigation.qml")));
+#endif
+	
+	return app.exec();
 }
+

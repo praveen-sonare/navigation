@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns="http://www.w3.org/ns/widgets" id="navigation" version="0.1">
-  <name>Navigation</name>
+  <name>navigation</name>
   <icon src="icon.svg"/>
   <content src="bin/navigation" type="application/vnd.agl.native"/>
-  <description>This is a demo application for navigation</description>
-  <author>Matt Ranostay &lt;matt.ranostay@konsulko.com&gt;</author>
+  <description>This is a demo navigation application</description>
+  <author>Qt</author>
   <license>APL 2.0</license>
   <feature name="urn:AGL:widget:required-api">
-    <param name="geoclue" value="ws" />
-    <param name="geofence" value="ws" />
-    <param name="gps" value="ws" />
-    <param name="windowmanager" value="ws" />
-    <param name="homescreen" value="ws" />
+    <param name="windowmanager" value="ws"/>
+    <param name="homescreen" value="ws"/>
+    <param name="naviapi" value="ws"/>
   </feature>
   <feature name="urn:AGL:widget:required-permission">
-    <param name="urn:AGL:permission::public:no-htdocs" value="required" />
+    <param name="urn:AGL:permission::public:no-htdocs" value="required"/>
   </feature>
 </widget>
+
+

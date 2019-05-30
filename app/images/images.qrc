@@ -1,0 +1,29 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>200px-Black_close_x.svg.png</file>
+        <file>202px-Compass-icon_bb_N.svg.png</file>
+        <file>240px-Antu_file-zoom-out.svg.png</file>
+        <file>240px-Antu_kdenlive-zoom-large.svg.png</file>
+        <file>240px-Compass_icon_NE.svg.png</file>
+        <file>207px-Car_icon_top.svg.png</file>
+        <file>10_11_bear_left_112px-Signal_C117a.svg.png</file>
+        <file>11_2_bear_right_112px-Signal_C117a.svg.png</file>
+        <file>SW_Patern_3.bmp</file>
+        <file>Map_symbol_location_02.png</file>
+        <file>Map_marker_icon_–_Nicolas_Mollet_–_Flag_–_Tourism_–_Classic.png</file>
+        <file>145px-16_cardinal_points_E.png</file>
+        <file>145px-16_cardinal_points_N.png</file>
+        <file>145px-16_cardinal_points_NE.png</file>
+        <file>145px-16_cardinal_points_NW.png</file>
+        <file>145px-16_cardinal_points_SE.png</file>
+        <file>145px-16_cardinal_points_SW.png</file>
+        <file>145px-16_cardinal_points_W.png</file>
+        <file>146px-Israely_road_sign_211.svg.png</file>
+        <file>146px-Israely_road_sign_212.svg.png</file>
+        <file>Emoji_u1f3c1.svg</file>
+        <file>HEB_project_flow_icon_04_checkered_flag.svg</file>
+        <file>MUTCD_RS-113.svg</file>
+        <file>posimark_r.png</file>
+        <file>position02.svg</file>
+    </qresource>
+</RCC>
