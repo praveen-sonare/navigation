@@ -104,14 +104,14 @@ ApplicationWindow {
                     map.doPauseSimulationSlot()
                 }
                 else if(message_json[2].event === event_gps){
-                    console.log ("navi:Receive Event======event_gps")
+                    //console.log ("navi:Receive Event======event_gps")
                     var lat = message_json[2].data.latitude
                     var lon = message_json[2].data.longitude
-                    console.log ("navi:Receive Event lat====== " + lat+" "+"lon======"+lon)
+                    //console.log ("navi:Receive Event lat====== " + lat+" "+"lon======"+lon)
                      map.currentpostion = QtPositioning.coordinate(lat, lon);
-                    console.log ("navi:last_car_pos_lat====== " + last_car_pos_lat+" "+"last_car_pos_lon======"+last_car_pos_lon)
+                    //console.log ("navi:last_car_pos_lat====== " + last_car_pos_lat+" "+"last_car_pos_lon======"+last_car_pos_lon)
                     car_driving_distance = map.calculateDistance(last_car_pos_lat,last_car_pos_lon,lat,lon)
-                    console.log("navi:car_driving_distance ====== "+car_driving_distance)
+                    //console.log("navi:car_driving_distance ====== "+car_driving_distance)
                     last_car_pos_lat = lat
                     last_car_pos_lon = lon
 
@@ -125,7 +125,7 @@ ApplicationWindow {
             }
             else if(message_json[0] === msgid_enu.retok){
                 if (message_json[2].request.info === verb_getcurretpos){
-                    console.log("navi:Callback Response ====== verb_getcurretpos")
+                    //console.log("navi:Callback Response ====== verb_getcurretpos")
                     var currentlat = message_json[2].response[0].CurrentLatitude
                     var currentlon = message_json[2].response[0].CurrentLongitude
 //                    var currentheading = message_json[2].response[0].CurrentHeading
@@ -707,8 +707,8 @@ ApplicationWindow {
         }
         function updatePositon()
         {
-            console.log("navi: pathcounter = "+pathcounter+" path.length = "+routeModel.get(0).path.length)
-            console.log("navi: segmentcounter = "+segmentcounter+" segments.length = "+routeModel.get(0).segments.length)
+            //console.log("navi: pathcounter = "+pathcounter+" path.length = "+routeModel.get(0).path.length)
+            //console.log("navi: segmentcounter = "+segmentcounter+" segments.length = "+routeModel.get(0).segments.length)
             if(pathcounter <= routeModel.get(0).path.length - 1){
                 // calculate distance
                 var next_distance = calculateDistance(map.currentpostion.latitude,
@@ -729,7 +729,7 @@ ApplicationWindow {
                                                             routeModel.get(0).segments[segmentcounter].path[0].latitude,
                                                             routeModel.get(0).segments[segmentcounter].path[0].longitude);
 
-                console.log("navi:next_distance="+next_distance+" next_direction"+next_direction+" next_cross_distance"+next_cross_distance)
+                //console.log("navi:next_distance="+next_distance+" next_direction"+next_direction+" next_cross_distance"+next_cross_distance)
 
                 // map rotateAnimation cntrol
                 if(root.st_heading_up) {
@@ -747,7 +747,7 @@ ApplicationWindow {
                         is_rotating = 360 - is_rotating;
                     }
 
-                    console.log("navi:is_rotating========= "+ is_rotating)
+                    //console.log("navi:is_rotating========= "+ is_rotating)
 
                     // rotation angle case
                     if(is_rotating > 180){
@@ -790,7 +790,7 @@ ApplicationWindow {
                 {
 //                    car_accumulated_distance += next_distance
 //                    do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
-                    console.log("lqy:pathcounter ======" + pathcounter)
+                    //("lqy:pathcounter ======" + pathcounter)
 //                    console.log("lqy:routeModel.get(0).path.length - 1 ======" + routeModel.get(0).path.length - 1)
                     if(pathcounter < routeModel.get(0).path.length - 1){
                         pathcounter++
@@ -811,7 +811,7 @@ ApplicationWindow {
 //                   do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
                 }
 
-                console.log("navi:car_accumulated_distance======" + car_accumulated_distance)
+                //console.log("navi:car_accumulated_distance======" + car_accumulated_distance)
                 car_accumulated_distance += car_driving_distance
                 do_setdemorouteinfo(map.currentpostion.latitude,map.currentpostion.longitude,next_direction,next_cross_distance)
 

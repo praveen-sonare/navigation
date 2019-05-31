@@ -116,8 +116,12 @@ int main(int argc, char *argv[])
 	QLibHomeScreen* qhsHandler = new QLibHomeScreen();
     qhsHandler->init(port, secret.toStdString().c_str());
 	qhsHandler->set_event_handler(QLibHomeScreen::Event_TapShortcut, [qwmHandler, myname](json_object *object){
-        qDebug("Surface %s got tapShortcut\n", qPrintable(myname));
-        qwmHandler->activateWindow(myname);
+        json_object *para, *area;
+        json_object_object_get_ex(object, "parameter", &para);
+        json_object_object_get_ex(para, "area", &area);
+        const char *displayArea = json_object_get_string(area);
+        qDebug("Surface Navigation got tapShortcut, area: %s \n", displayArea);
+        qwmHandler->activateWindow(myname, QString(QLatin1String(displayArea)));
 	});
 	// Load qml
 
