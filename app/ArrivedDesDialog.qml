@@ -62,7 +62,7 @@ Rectangle {
             spacing: 10
             Image {
                 id: dsp_mark
-                source: dsp_icon
+//                source: dsp_icon
                 Layout.maximumHeight: 120
                 Layout.maximumWidth:  120
             }

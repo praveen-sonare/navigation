@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	QLibHomeScreen* qhsHandler = new QLibHomeScreen();
     qhsHandler->init(port, secret.toStdString().c_str());
 	qhsHandler->set_event_handler(QLibHomeScreen::Event_TapShortcut, [qwmHandler, myname](json_object *object){
-        qDebug("Surface %s got tapShortcut\n", myname);
+        qDebug("Surface %s got tapShortcut\n", qPrintable(myname));
         qwmHandler->activateWindow(myname);
 	});
 	// Load qml

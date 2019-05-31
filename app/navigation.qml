@@ -574,7 +574,7 @@ ApplicationWindow {
             map.currentpostion = QtPositioning.coordinate(car_position_lat, car_position_lon)
             car_accumulated_distance = 0
             do_setdemorouteinfo(car_position_lat, car_position_lon,car_direction,car_accumulated_distance)
-            do_setdemorouteinfo(car_direction,car_accumulated_distance)
+//            do_setdemorouteinfo(car_direction,car_accumulated_distance)
 
 
             routeQuery.clearWaypoints();
