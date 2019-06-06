@@ -99,6 +99,8 @@ ApplicationWindow {
                     var longitude = message_json[2].data[0].longitude
                     var startFromCurrentPos = message_json[2].data[0].startFromCurrentPosition
 //                    map.doSetWaypointsSlot(latitude,longitude,startFromCurrentPos);
+                    map.initDestination()
+                    map.center = map.currentpostion
                      map.addDestination(QtPositioning.coordinate(35.6585580781371,139.745503664017))
                     vui_startguidance()
                 }
