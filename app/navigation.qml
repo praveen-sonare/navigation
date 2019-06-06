@@ -56,6 +56,7 @@ ApplicationWindow {
     property string verb_setdestpos: "navicore_setdestpos"
     property string verb_setdemorouteinfo: "navicore_setdemorouteinfo"
     property string verb_startguidance: "navicore_startguidance"
+    property string verb_cancelguidance: "navicore_cancelguidance"
     property string verb_setdestinationdirection: "navicore_setdestdir"
     property string event_setwaypoints: "naviapi/navicore_setwaypoints"
     property string event_pausesimulation: "naviapi/navicore_pausesimulation"
@@ -97,7 +98,9 @@ ApplicationWindow {
                     var latitude = message_json[2].data[0].latitude
                     var longitude = message_json[2].data[0].longitude
                     var startFromCurrentPos = message_json[2].data[0].startFromCurrentPosition
-                    map.doSetWaypointsSlot(latitude,longitude,startFromCurrentPos);
+//                    map.doSetWaypointsSlot(latitude,longitude,startFromCurrentPos);
+                     map.addDestination(QtPositioning.coordinate(35.6585580781371,139.745503664017))
+                    vui_startguidance()
                 }
                 //Pause Simulation from poi app
                 else if(message_json[2].event === event_pausesimulation){
@@ -243,11 +246,28 @@ ApplicationWindow {
         console.log("navi:do_startguidance = " + navigation_request_str)
     }
 
+    //cancel guidance
+    function do_cancelguidance() {
+        navigation_request_str = '[' + msgid_enu.call + ',"99999","' + api_str+'/'+verb_cancelguidance + '", {"cancelguidance":"' + true + '"} ]'
+        websocket.sendTextMessage (navigation_request_str)
+        console.log("navi:do_cancelguidance = " + navigation_request_str)
+    }
+
     //set the destination direction during the demo
     function do_setdestinationdirection(direction) {
         navigation_request_str = '[' + msgid_enu.call + ',"99999","' + api_str+'/'+verb_setdestinationdirection + '", {"state":"'+direction+ '"} ]'
         websocket.sendTextMessage (navigation_request_str)
         console.log("navi:do_setdestinationdirection = " + navigation_request_str)
+    }
+
+
+    function vui_startguidance(){
+        btn_guidance.startGuidance()
+        console.log("vui_startguidance started")
+    }
+    function vui_cancelguidance(){
+        btn_guidance.discardWaypoints()
+        console.log("vui_cancelguidance started")
     }
 
     Map{
@@ -692,7 +712,8 @@ ApplicationWindow {
                     if (Math.abs(map.pressX - mouse.x ) < map.jitterThreshold
                             && Math.abs(map.pressY - mouse.y ) < map.jitterThreshold) {
 //                        map.addDestination(lastCoordinate)
-                        map.addDestination(QtPositioning.coordinate(35.6590297708,139.7456818931))
+                        map.addDestination(QtPositioning.coordinate(35.6585580781371,139.745503664017))
+//                        root.vui_startguidance()
 //                        btn_guidance.sts_guide = 2;
                     }
                 }

@@ -65,6 +65,7 @@ Item {
 
         btn_guidance.sts_guide = 0
         btn_guidance.state = "Idle"
+        root.do_cancelguidance()
     }
 
 //    Timer {
