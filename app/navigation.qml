@@ -714,6 +714,8 @@ ApplicationWindow {
                     if (Math.abs(map.pressX - mouse.x ) < map.jitterThreshold
                             && Math.abs(map.pressY - mouse.y ) < map.jitterThreshold) {
 //                        map.addDestination(lastCoordinate)
+                        map.initDestination()
+                        map.center = map.currentpostion
                         map.addDestination(QtPositioning.coordinate(35.6585580781371,139.745503664017))
 //                        root.vui_startguidance()
 //                        btn_guidance.sts_guide = 2;
