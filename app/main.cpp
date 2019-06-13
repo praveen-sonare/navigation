@@ -124,7 +124,8 @@ int main(int argc, char *argv[])
 	engine.load(QUrl(QStringLiteral("qrc:/navigation.qml")));
  	QObject *root = engine.rootObjects().first();
 	QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
-	QObject::connect(window, SIGNAL(frameSwapped()), qwmHandler, SLOT(slotActivateSurface()));
+	// QObject::connect(window, SIGNAL(frameSwapped()), qwmHandler, SLOT(slotActivateSurface()));
+	qhsHandler->setQuickWindow(window);
     QObject *map = engine.rootObjects().first()->findChild<QObject*>("map");
 
 #else	// for only libwindowmanager
