@@ -12,10 +12,12 @@ Item {
                 btn_map_direction.state = "NorthUp"
                 car_position_mapitem.state = "NorthUp"
                 root.st_heading_up = false
+                btn_present_position.setbuttonclickedstate()
 			} else {
                 btn_map_direction.state = "HeadingUp"
                 car_position_mapitem.state = "HeadingUp"
                 root.st_heading_up = true
+                btn_present_position.setbuttonclickedstate()
 			}
             map.rotateMapSmooth()
         }

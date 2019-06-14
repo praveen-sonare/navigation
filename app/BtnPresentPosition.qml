@@ -25,6 +25,11 @@ Item {
             source: "images/207px-Car_icon_top.svg.png"
         }
     }
+    function setbuttonclickedstate(){
+        if (btn_present_position.state === "Optional"){
+            btn_present_position_.present_position_clicked()
+        }
+    }
     states: [
         State{
             name: "Flowing"

@@ -41,6 +41,11 @@ ApplicationWindow {
     property real last_car_pos_lat: fileOperation.getStartLatitude()
     property real last_car_pos_lon: fileOperation.getStartLongitute()
     property real car_driving_distance : 0
+    property real carheading: 0
+    property real currentheading: 0
+    property real present_direction: 0  //North
+    property bool st_demo_state: fileOperation.getDemoState()
+    property string imgdestinationstate: ""
 
 
     property string navigation_request_str: ""
@@ -58,10 +63,15 @@ ApplicationWindow {
     property string verb_startguidance: "navicore_startguidance"
     property string verb_cancelguidance: "navicore_cancelguidance"
     property string verb_setdestinationdirection: "navicore_setdestdir"
+    property string verb_setdemostate: "navicore_demostate"
     property string event_setwaypoints: "naviapi/navicore_setwaypoints"
+//    property string event_canceldestpos: "naviapi/navicore_canceldestpos" // not clear
     property string event_pausesimulation: "naviapi/navicore_pausesimulation"
     property string event_gps: "naviapi/navicore_gps"
     property string event_heading: "naviapi/navicore_heading"
+//    property string event_vuisetdest: "naviapi/navicore_setdestpos"
+//    property string event_vuistartdemo: "naviapi/navicore_startnavigation"
+//    property string event_vuicanceldemo: "naviapi/navicore_cancelnavigation"
     property var msgid_enu: { "call":2, "retok":3, "reterr":4, "event":5 }
 
     WebSocket {
@@ -75,15 +85,24 @@ ApplicationWindow {
                 countdown.start()
             }else if (websocket.status === WebSocket.Open){
                 console.log ("Socket Open")
-                do_subscribe("gps")
-                do_setallsessions()
-                //do_setcurrentpos()
-                do_getcurrentpos()
-                do_setallroutes(0)
-                do_subscribe("setwaypoints")
-                do_subscribe("pausesimulation")
-//                do_subscribe("gps")
-//                do_subscribe("heading")
+                do_demostate(st_demo_state)
+                if (st_demo_state === false){
+                    do_setallsessions()
+                    //do_setcurrentpos()
+                    do_getcurrentpos()
+                    do_setallroutes(0)
+                    do_subscribe("setwaypoints")
+                    do_subscribe("pausesimulation")
+                    do_subscribe("gps")
+                    do_subscribe("heading")
+                    do_subscribe("adddest")
+                } else {
+                    do_setcurrentpos()
+                    do_setallroutes(0)
+                    do_subscribe("setwaypoints")
+                    do_subscribe("pausesimulation")
+                }
+
             }else if (websocket.status === WebSocket.Closed){
                 console.log ("Socket closed")
             }
@@ -95,51 +114,115 @@ ApplicationWindow {
             if (message_json[0] === msgid_enu.event){
                 //add destination from poi app
                 if(message_json[2].event === event_setwaypoints){
-                    var latitude = message_json[2].data[0].latitude
-                    var longitude = message_json[2].data[0].longitude
-                    var startFromCurrentPos = message_json[2].data[0].startFromCurrentPosition
+//                    var latitude = message_json[2].data[0].latitude
+//                    var longitude = message_json[2].data[0].longitude
+//                    var startFromCurrentPos = message_json[2].data[0].startFromCurrentPosition
 //                    map.doSetWaypointsSlot(latitude,longitude,startFromCurrentPos);
-                    map.initDestination()
-                    map.center = map.currentpostion
-                     map.addDestination(QtPositioning.coordinate(35.6585580781371,139.745503664017))
-                    vui_startguidance()
+                      root.do_cancelguidance()
+                      map.initDestination()
+                      map.center = map.currentpostion
+                      map.addDestination(QtPositioning.coordinate(35.6585580781371,139.745503664017))
+                      vui_startguidance()
                 }
                 //Pause Simulation from poi app
                 else if(message_json[2].event === event_pausesimulation){
                     map.doPauseSimulationSlot()
                 }
                 else if(message_json[2].event === event_gps){
-                    //console.log ("navi:Receive Event======event_gps")
-                    var lat = message_json[2].data.latitude
-                    var lon = message_json[2].data.longitude
-                    //console.log ("navi:Receive Event lat====== " + lat+" "+"lon======"+lon)
-                     map.currentpostion = QtPositioning.coordinate(lat, lon);
-                    //console.log ("navi:last_car_pos_lat====== " + last_car_pos_lat+" "+"last_car_pos_lon======"+last_car_pos_lon)
-                    car_driving_distance = map.calculateDistance(last_car_pos_lat,last_car_pos_lon,lat,lon)
-                    //console.log("navi:car_driving_distance ====== "+car_driving_distance)
-                    last_car_pos_lat = lat
-                    last_car_pos_lon = lon
+                    if (st_demo_state === false){
+                        console.log ("navi:Receive Event======event_gps")
+                        var lat = message_json[2].data.latitude
+                        var lon = message_json[2].data.longitude
+                        console.log ("navi:Receive Event lat====== " + lat+" "+"lon======"+lon)
+                         map.currentpostion = QtPositioning.coordinate(lat, lon);
+                        console.log ("navi:last_car_pos_lat====== " + last_car_pos_lat+" "+"last_car_pos_lon======"+last_car_pos_lon)
+                        car_driving_distance = map.calculateDistance(last_car_pos_lat,last_car_pos_lon,lat,lon)
+                        console.log("navi:car_driving_distance ====== "+car_driving_distance)
+                        last_car_pos_lat = lat
+                        last_car_pos_lon = lon
 
-                    if(btn_guidance.sts_guide === 2){
-                       map.updatePositon()
+                        if(btn_guidance.sts_guide === 2){
+                           map.updatePositon()
 
+                        }
                     }
 
                 }
+                else if(message_json[2].event === event_heading){
+                    if (st_demo_state === false) {
+                        console.log("navi:Receive event====== event_heading")
+                        carheading = message_json[2].data.heading
+                        console.log("navi: heading======"+carheading)
+                        if (map.state === "smooth_rotate_north"){
+                            if(carheading>=0){
+                                car_direction = carheading+265-map.bearing
+                            }
+                            else {
+                                car_direction = carheading+360+265-map.bearing
+                            }
+                        }
+                        else if (map.state === "smooth_rotate_present"){
+                            if(carheading>=0){
+                                car_direction = carheading+265-map.bearing
+                            }
+                            else {
+                                car_direction = carheading+360+265-map.bearing
+                            }
+                        }
+                        else {
+                            if(carheading>=0){
+                                car_direction = carheading+265
+                            }
+                            else {
+                                car_direction = carheading+360+265
+                            }
+                        }
+                    }
+                }
+//                else if(message_json[2].event === event_vuisetdest){
+//                     console.log("navi:Receive event====== event_vuisetdest")
+//                    var deslat = message_json[2].data[0].DestinationLatitude
+//                    var deslon = message_json[2].data[0].DestinationLongitude
+//                    console.log ("navi:deslat====== " + deslat+" "+"deslon======"+deslon)
+//                    map.addDestination(QtPositioning.coordinate(deslat,deslon))
+//                }
+//                else if(message_json[2].event === event_vuistartdemo){
+////                    var demostate = message_json[2].data.demostate
+//                    console.log("navi:Receive event====== event_vuistartdemo")
+//                    vui_startguidance()
+
+//                }
+//                else if(message_json[2].event === event_vuicanceldemo){
+//                    console.log("navi:Receive event====== event_vuicanceldemo")
+//                    vui_cancelguidance()
+//                }
+//                else if(message_json[2].event === event_canceldestpos){
+//                     console.log("navi:Receive event====== event_canceldestpos")
+//                    vui_cancelguidance()
+//                }
 
             }
             else if(message_json[0] === msgid_enu.retok){
                 if (message_json[2].request.info === verb_getcurretpos){
-                    //console.log("navi:Callback Response ====== verb_getcurretpos")
-                    var currentlat = message_json[2].response[0].CurrentLatitude
-                    var currentlon = message_json[2].response[0].CurrentLongitude
-//                    var currentheading = message_json[2].response[0].CurrentHeading
-                     console.log ("navi:Response verb_getcurretpos currentlat====== " + currentlat+" currentlon======"+currentlon)
-                    car_position_lat = currentlat
-                    car_position_lon = currentlon
-//                    car_direction = currentheading
-                    last_car_pos_lat = currentlat
-                    last_car_pos_lon = currentlon
+                    if (st_demo_state === false){
+                        console.log("navi:Callback Response ====== verb_getcurretpos")
+                        var currentlat = message_json[2].response[0].CurrentLatitude
+                        var currentlon = message_json[2].response[0].CurrentLongitude
+                        currentheading = message_json[2].response[0].CurrentHeading
+                         console.log ("navi:Response verb_getcurretpos currentlat====== " + currentlat+" currentlon======"+currentlon)
+                        car_position_lat = currentlat
+                        car_position_lon = currentlon
+//                        map.currentpostion = QtPositioning.coordinate(car_position_lat, car_position_lon)
+                        if(currentheading>=0){
+                            car_direction = currentheading+265
+                        }
+                        else {
+                            car_direction = currentheading+360+265
+                        }
+
+                        last_car_pos_lat = currentlat
+                        last_car_pos_lon = currentlon
+                    }
                 }
             }
         }
@@ -262,6 +345,12 @@ ApplicationWindow {
         console.log("navi:do_setdestinationdirection = " + navigation_request_str)
     }
 
+    //start demo
+    function do_demostate(state) {
+        navigation_request_str = '[' + msgid_enu.call + ',"99999","' + api_str+'/'+verb_setdemostate + '", {"DemoState":"'+state+ '"} ]'
+        websocket.sendTextMessage (navigation_request_str)
+        console.log("navi:do_demostate = " + navigation_request_str)
+    }
 
     function vui_startguidance(){
         btn_guidance.startGuidance()
@@ -393,6 +482,10 @@ ApplicationWindow {
                 },
                 State {
                     name: "NorthUp"
+                    PropertyChanges { target: car_position_mapitem_image_rotate; angle: root.car_direction }
+                },
+                State {
+                    name: "HeadingUpPresent"
                     PropertyChanges { target: car_position_mapitem_image_rotate; angle: root.car_direction }
                 }
             ]
@@ -593,6 +686,7 @@ ApplicationWindow {
             console.log("initWaypoint")
 
             // reset currentpostion
+//            root.do_getcurrentpos()
             map.currentpostion = QtPositioning.coordinate(car_position_lat, car_position_lon)
             car_accumulated_distance = 0
             do_setdemorouteinfo(car_position_lat, car_position_lon,car_direction,car_accumulated_distance)
@@ -713,11 +807,15 @@ ApplicationWindow {
                 {
                     if (Math.abs(map.pressX - mouse.x ) < map.jitterThreshold
                             && Math.abs(map.pressY - mouse.y ) < map.jitterThreshold) {
-//                        map.addDestination(lastCoordinate)
-                        map.initDestination()
-                        map.center = map.currentpostion
-                        map.addDestination(QtPositioning.coordinate(35.6585580781371,139.745503664017))
-//                        root.vui_startguidance()
+                        if (st_demo_state === true){
+                            map.addDestination(lastCoordinate)
+                        }
+                        else {
+                            root.do_cancelguidance()
+                            map.initDestination()
+                            map.center = map.currentpostion
+                            map.addDestination(QtPositioning.coordinate(35.6585580781371,139.745503664017))
+                        }
 //                        btn_guidance.sts_guide = 2;
                     }
                 }
@@ -732,8 +830,8 @@ ApplicationWindow {
         }
         function updatePositon()
         {
-            //console.log("navi: pathcounter = "+pathcounter+" path.length = "+routeModel.get(0).path.length)
-            //console.log("navi: segmentcounter = "+segmentcounter+" segments.length = "+routeModel.get(0).segments.length)
+            console.log("navi: pathcounter = "+pathcounter+" path.length = "+routeModel.get(0).path.length)
+            console.log("navi: segmentcounter = "+segmentcounter+" segments.length = "+routeModel.get(0).segments.length)
             if(pathcounter <= routeModel.get(0).path.length - 1){
                 // calculate distance
                 var next_distance = calculateDistance(map.currentpostion.latitude,
@@ -754,7 +852,7 @@ ApplicationWindow {
                                                             routeModel.get(0).segments[segmentcounter].path[0].latitude,
                                                             routeModel.get(0).segments[segmentcounter].path[0].longitude);
 
-                //console.log("navi:next_distance="+next_distance+" next_direction"+next_direction+" next_cross_distance"+next_cross_distance)
+                console.log("navi:next_distance="+next_distance+" next_direction"+next_direction+" next_cross_distance"+next_cross_distance)
 
                 // map rotateAnimation cntrol
                 if(root.st_heading_up) {
@@ -772,7 +870,7 @@ ApplicationWindow {
                         is_rotating = 360 - is_rotating;
                     }
 
-                    //console.log("navi:is_rotating========= "+ is_rotating)
+                    console.log("navi:is_rotating========= "+ is_rotating)
 
                     // rotation angle case
                     if(is_rotating > 180){
@@ -808,14 +906,14 @@ ApplicationWindow {
                     rot_anim.easing.type = Easing.OutQuad;
                 }
 
-                root.car_direction = next_direction;
+//                root.car_direction = next_direction;
 
                 // set next coordidnate
-                if(next_distance < 3)
+                if(next_distance < 10)
                 {
 //                    car_accumulated_distance += next_distance
 //                    do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
-                    //("lqy:pathcounter ======" + pathcounter)
+                    console.log("lqy:pathcounter ======" + pathcounter)
 //                    console.log("lqy:routeModel.get(0).path.length - 1 ======" + routeModel.get(0).path.length - 1)
                     if(pathcounter < routeModel.get(0).path.length - 1){
                         pathcounter++
@@ -836,9 +934,164 @@ ApplicationWindow {
 //                   do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
                 }
 
-                //console.log("navi:car_accumulated_distance======" + car_accumulated_distance)
+                console.log("navi:car_accumulated_distance======" + car_accumulated_distance)
                 car_accumulated_distance += car_driving_distance
                 do_setdemorouteinfo(map.currentpostion.latitude,map.currentpostion.longitude,next_direction,next_cross_distance)
+
+                if(btn_present_position.state === "Flowing")
+                {
+                    // update map.center
+                    map.center = map.currentpostion
+                }
+                rotateMapSmooth()
+
+                // report a new instruction if current position matches with the head position of the segment
+                if(segmentcounter <= routeModel.get(0).segments.length - 1){
+                     if(next_cross_distance < 8){
+                        progress_next_cross.setProgress(0)
+                        if(segmentcounter < routeModel.get(0).segments.length - 1){
+                            segmentcounter++
+                        }
+                        if(segmentcounter === routeModel.get(0).segments.length - 1){
+//                            img_destination_direction.state = "12"
+                            imgdestinationstate = "12"
+                            map.removeMapItem(icon_segment_point)
+//                            root.do_setdestinationdirection(img_destination_direction.state)
+                        }else{
+//                            img_destination_direction.state = routeModel.get(0).segments[segmentcounter].maneuver.direction
+                            imgdestinationstate = routeModel.get(0).segments[segmentcounter].maneuver.direction
+                            icon_segment_point.coordinate = routeModel.get(0).segments[segmentcounter].path[0]
+                            map.addMapItem(icon_segment_point)
+//                            root.do_setdestinationdirection(img_destination_direction.state)
+                        }
+                    }else{
+                        if(next_cross_distance <= 330 && last_segmentcounter != segmentcounter) {
+                            last_segmentcounter = segmentcounter
+                            guidanceModule.guidance(routeModel.get(0).segments[segmentcounter].maneuver.instructionText)
+                            img_destination_direction.state = imgdestinationstate
+                            root.do_setdestinationdirection(img_destination_direction.state)
+                            if (routeModel.get(0).segments[segmentcounter].maneuver.instructionText === "Head southeast"){
+                                img_destination_direction.state = "1"
+                                root.do_setdestinationdirection(img_destination_direction.state)
+                            }
+                        }
+                        else{
+                            if (next_cross_distance > 330){
+                                img_destination_direction.state = "1"
+                                root.do_setdestinationdirection(img_destination_direction.state)
+                            }
+                        }
+                        // update progress_next_cross
+                        progress_next_cross.setProgress(next_cross_distance)
+                    }
+                }
+            }
+        }
+
+        function updateDemoPositon()
+        {
+            if(pathcounter <= routeModel.get(0).path.length - 1){
+                // calculate distance
+                var next_distance = calculateDistance(map.currentpostion.latitude,
+                                                      map.currentpostion.longitude,
+                                                      routeModel.get(0).path[pathcounter].latitude,
+                                                      routeModel.get(0).path[pathcounter].longitude);
+
+                // calculate direction
+                var next_direction = calculateDirection(map.currentpostion.latitude,
+                                                        map.currentpostion.longitude,
+                                                        routeModel.get(0).path[pathcounter].latitude,
+                                                        routeModel.get(0).path[pathcounter].longitude);
+
+                // calculate next cross distance
+                var next_cross_distance = calculateDistance(map.currentpostion.latitude,
+                                                            map.currentpostion.longitude,
+                                                            routeModel.get(0).segments[segmentcounter].path[0].latitude,
+                                                            routeModel.get(0).segments[segmentcounter].path[0].longitude);
+
+                // map rotateAnimation cntrol
+                if(root.st_heading_up) {
+                    var is_rotating = 0;
+                    var cur_direction = Math.floor(map.bearing);
+
+                    // check is_rorating
+                    if(cur_direction > Math.floor(next_direction)){
+                        is_rotating = Math.floor(cur_direction - next_direction);
+                    }else{
+                        is_rotating = Math.floor(next_direction - cur_direction);
+                    }
+
+                    if(is_rotating > 180){
+                        is_rotating = 360 - is_rotating;
+                    }
+
+                    // rotation angle case
+                    if(is_rotating > 180){
+                        // driving stop hard turn
+                        root.car_moving_distance = 0;
+                        rot_anim.duration = 1600;
+                        rot_anim.easing.type = Easing.OutQuint;
+                    } else if(is_rotating > 90){
+                        // driving stop normal turn
+                        root.car_moving_distance = 0;
+                        rot_anim.duration = 800;
+                        rot_anim.easing.type = Easing.OutQuart;
+                    } else if(is_rotating > 60){
+                        // driving slow speed normal turn
+                        root.car_moving_distance = ((car_driving_speed / 3.6) / (1000/positionTimer_interval)) * 0.3;
+                        rot_anim.duration = 400;
+                        rot_anim.easing.type = Easing.OutCubic;
+                    } else if(is_rotating > 30){
+                        // driving half speed soft turn
+                        root.car_moving_distance = ((car_driving_speed / 3.6) / (1000/positionTimer_interval)) * 0.5;
+                        rot_anim.duration = 300;
+                        rot_anim.easing.type = Easing.OutQuad;
+                    } else {
+                        // driving nomal speed soft turn
+                        root.car_moving_distance = (car_driving_speed / 3.6) / (1000/positionTimer_interval);
+                        rot_anim.duration = 200;
+                        rot_anim.easing.type = Easing.OutQuad;
+                    }
+                }else{
+                    // NorthUp
+                    root.car_moving_distance = (car_driving_speed / 3.6) / (1000/positionTimer_interval);
+                    rot_anim.duration = 200;
+                    rot_anim.easing.type = Easing.OutQuad;
+                }
+
+//                root.car_direction = next_direction;
+                if (map.state === "smooth_rotate_north"){
+                    root.car_direction = next_direction-map.bearing;
+                }
+                else if (map.state === "smooth_rotate_present"){
+                    root.car_direction = next_direction-map.bearing;
+                }
+                else {
+                    root.car_direction = next_direction;
+                }
+
+                // set next coordidnate
+                if(next_distance < (root.car_moving_distance * 1.5))
+                {
+                    map.currentpostion = routeModel.get(0).path[pathcounter]
+                    car_accumulated_distance += next_distance
+                    do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
+                    if(pathcounter < routeModel.get(0).path.length - 1){
+                        pathcounter++
+                    }
+                    else
+                    {
+                        // Arrive at your destination
+                        btn_guidance.sts_guide = 0
+                        do_arrivedest()
+                    }
+                }else{
+                    setNextCoordinate(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,root.car_moving_distance)
+                    if(pathcounter != 0){
+                        car_accumulated_distance += root.car_moving_distance
+                    }
+                   do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
+                }
 
                 if(btn_present_position.state === "Flowing")
                 {
@@ -855,19 +1108,33 @@ ApplicationWindow {
                             segmentcounter++
                         }
                         if(segmentcounter === routeModel.get(0).segments.length - 1){
-                            img_destination_direction.state = "12"
+//                            img_destination_direction.state = "12"
+                            imgdestinationstate = "12"
                             map.removeMapItem(icon_segment_point)
-                            root.do_setdestinationdirection(img_destination_direction.state)
+//                            root.do_setdestinationdirection(img_destination_direction.state)
                         }else{
-                            img_destination_direction.state = routeModel.get(0).segments[segmentcounter].maneuver.direction
+//                            img_destination_direction.state = routeModel.get(0).segments[segmentcounter].maneuver.direction
+                            imgdestinationstate = routeModel.get(0).segments[segmentcounter].maneuver.direction
                             icon_segment_point.coordinate = routeModel.get(0).segments[segmentcounter].path[0]
                             map.addMapItem(icon_segment_point)
-                            root.do_setdestinationdirection(img_destination_direction.state)
+//                            root.do_setdestinationdirection(img_destination_direction.state)
                         }
                     }else{
                         if(next_cross_distance <= 330 && last_segmentcounter != segmentcounter) {
                             last_segmentcounter = segmentcounter
                             guidanceModule.guidance(routeModel.get(0).segments[segmentcounter].maneuver.instructionText)
+                            img_destination_direction.state = imgdestinationstate
+                            root.do_setdestinationdirection(img_destination_direction.state)
+                            if (routeModel.get(0).segments[segmentcounter].maneuver.instructionText === "Head southeast"){
+                                img_destination_direction.state = "1"
+                                root.do_setdestinationdirection(img_destination_direction.state)
+                            }
+                        }
+                        else{
+                            if (next_cross_distance > 330){
+                                img_destination_direction.state = "1"
+                                root.do_setdestinationdirection(img_destination_direction.state)
+                            }
                         }
                         // update progress_next_cross
                         progress_next_cross.setProgress(next_cross_distance)
@@ -879,8 +1146,20 @@ ApplicationWindow {
 
         function rotateMapSmooth(){
             if(root.st_heading_up){
-                map.state = "none"
-                map.state = "smooth_rotate"
+//                map.state = "none"
+//                map.state = "smooth_rotate"
+                if (btn_present_position.state === "Optional"){
+
+                    map.state = "smooth_rotate_present"
+                    car_position_mapitem.state = "HeadingUpPresent"
+
+                }
+                else if(btn_present_position.state === "Flowing"){
+                    map.state = "none"
+                    map.state = "smooth_rotate"
+                    car_position_mapitem.state = "HeadingUp"
+                     root.present_direction = root.car_direction
+                }
             }else{
                 map.state = "smooth_rotate_north"
             }
@@ -924,6 +1203,10 @@ ApplicationWindow {
             State {
                 name: "smooth_rotate_north"
                 PropertyChanges { target: map; bearing: 0 }
+            },
+            State {
+                name: "smooth_rotate_present"
+                PropertyChanges { target: map; bearing: root.present_direction }
             }
         ]
 

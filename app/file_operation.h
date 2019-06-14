@@ -23,6 +23,8 @@ class File_Operation: public QObject{
     double m_start_latitude;
     double m_start_longitute;
     QString m_mapStyleUrls;
+    int m_demo_state;
+    bool m_demo_boolstate;
 
 public:
     File_Operation();
@@ -34,6 +36,7 @@ public:
     Q_INVOKABLE double getStartLatitude();
     Q_INVOKABLE double getStartLongitute();
     Q_INVOKABLE QString getMapStyleUrls();
+    Q_INVOKABLE bool getDemoState();
 
 private:
     void initFileOperation();

@@ -15,12 +15,16 @@ Item {
         console.log("onSts_guideChanged")
         switch(btn_guidance.sts_guide){
         case 0:
-//            positionTimer.stop();
+            if (root.st_demo_state === true){
+                positionTimer.stop();
+            }
             break
         case 1:
             break
         case 2:
-//            positionTimer.start();
+            if (root.st_demo_state === true){
+                positionTimer.start();
+            }
             break
         default:
             break
@@ -32,7 +36,9 @@ Item {
         btn_guidance.sts_guide = 2
         btn_guidance.state = "onGuide"
         map.addStartPoint()
-        root.do_startguidance()
+        if (root.st_demo_state === false){
+            root.do_startguidance()
+        }
     }
 
     function stopGuidance() {
@@ -65,16 +71,18 @@ Item {
 
         btn_guidance.sts_guide = 0
         btn_guidance.state = "Idle"
-        root.do_cancelguidance()
+        if (root.st_demo_state === false){
+            root.do_cancelguidance()
+        }
     }
 
-//    Timer {
-//        id: positionTimer
-//        interval: fileOperation.getUpdateInterval();
-//        running: false;
-//        repeat: true
-//        onTriggered: map.updatePositon()
-//    }
+    Timer {
+        id: positionTimer
+        interval: fileOperation.getUpdateInterval();
+        running: false;
+        repeat: true
+        onTriggered: map.updateDemoPositon()
+    }
 
     Button {
         id: discard
