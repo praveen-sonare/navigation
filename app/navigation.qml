@@ -1011,46 +1011,48 @@ ApplicationWindow {
 
                 // map rotateAnimation cntrol
                 if(root.st_heading_up) {
-                    var is_rotating = 0;
-                    var cur_direction = Math.floor(map.bearing);
+                    if(btn_present_position.state === "Flowing"){
+                        var is_rotating = 0;
+                        var cur_direction = Math.floor(map.bearing);
 
-                    // check is_rorating
-                    if(cur_direction > Math.floor(next_direction)){
-                        is_rotating = Math.floor(cur_direction - next_direction);
-                    }else{
-                        is_rotating = Math.floor(next_direction - cur_direction);
-                    }
+                        // check is_rorating
+                        if(cur_direction > Math.floor(next_direction)){
+                            is_rotating = Math.floor(cur_direction - next_direction);
+                        }else{
+                            is_rotating = Math.floor(next_direction - cur_direction);
+                        }
 
-                    if(is_rotating > 180){
-                        is_rotating = 360 - is_rotating;
-                    }
+                        if(is_rotating > 180){
+                            is_rotating = 360 - is_rotating;
+                        }
 
-                    // rotation angle case
-                    if(is_rotating > 180){
-                        // driving stop hard turn
-                        root.car_moving_distance = 0;
-                        rot_anim.duration = 1600;
-                        rot_anim.easing.type = Easing.OutQuint;
-                    } else if(is_rotating > 90){
-                        // driving stop normal turn
-                        root.car_moving_distance = 0;
-                        rot_anim.duration = 800;
-                        rot_anim.easing.type = Easing.OutQuart;
-                    } else if(is_rotating > 60){
-                        // driving slow speed normal turn
-                        root.car_moving_distance = ((car_driving_speed / 3.6) / (1000/positionTimer_interval)) * 0.3;
-                        rot_anim.duration = 400;
-                        rot_anim.easing.type = Easing.OutCubic;
-                    } else if(is_rotating > 30){
-                        // driving half speed soft turn
-                        root.car_moving_distance = ((car_driving_speed / 3.6) / (1000/positionTimer_interval)) * 0.5;
-                        rot_anim.duration = 300;
-                        rot_anim.easing.type = Easing.OutQuad;
-                    } else {
-                        // driving nomal speed soft turn
-                        root.car_moving_distance = (car_driving_speed / 3.6) / (1000/positionTimer_interval);
-                        rot_anim.duration = 200;
-                        rot_anim.easing.type = Easing.OutQuad;
+                        // rotation angle case
+                        if(is_rotating > 180){
+                            // driving stop hard turn
+                            root.car_moving_distance = 0;
+                            rot_anim.duration = 1600;
+                            rot_anim.easing.type = Easing.OutQuint;
+                        } else if(is_rotating > 90){
+                            // driving stop normal turn
+                            root.car_moving_distance = 0;
+                            rot_anim.duration = 800;
+                            rot_anim.easing.type = Easing.OutQuart;
+                        } else if(is_rotating > 60){
+                            // driving slow speed normal turn
+                            root.car_moving_distance = ((car_driving_speed / 3.6) / (1000/positionTimer_interval)) * 0.3;
+                            rot_anim.duration = 400;
+                            rot_anim.easing.type = Easing.OutCubic;
+                        } else if(is_rotating > 30){
+                            // driving half speed soft turn
+                            root.car_moving_distance = ((car_driving_speed / 3.6) / (1000/positionTimer_interval)) * 0.5;
+                            rot_anim.duration = 300;
+                            rot_anim.easing.type = Easing.OutQuad;
+                        } else {
+                            // driving nomal speed soft turn
+                            root.car_moving_distance = (car_driving_speed / 3.6) / (1000/positionTimer_interval);
+                            rot_anim.duration = 200;
+                            rot_anim.easing.type = Easing.OutQuad;
+                        }
                     }
                 }else{
                     // NorthUp
@@ -1075,7 +1077,7 @@ ApplicationWindow {
                 {
                     map.currentpostion = routeModel.get(0).path[pathcounter]
                     car_accumulated_distance += next_distance
-                    do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
+                    do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,next_cross_distance)
                     if(pathcounter < routeModel.get(0).path.length - 1){
                         pathcounter++
                     }
@@ -1084,13 +1086,15 @@ ApplicationWindow {
                         // Arrive at your destination
                         btn_guidance.sts_guide = 0
                         do_arrivedest()
+                        arrived.visible = true
+                        dialogtimer.start()
                     }
                 }else{
                     setNextCoordinate(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,root.car_moving_distance)
                     if(pathcounter != 0){
                         car_accumulated_distance += root.car_moving_distance
                     }
-                   do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
+                   do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,next_cross_distance)
                 }
 
                 if(btn_present_position.state === "Flowing")
