@@ -138,7 +138,6 @@ int main(int argc, char *argv[])
  	QObject *root = engine.rootObjects().first();
 	QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
     qhsHandler->setQuickWindow(window);
-
     /*Homescreen notify navigation start*/
         qhsHandler->set_event_handler(QLibHomeScreen::Event_StartNavigation, [root](json_object *object){
 //            QMetaObject::invokeMethod(root,"vui_startguidance");
@@ -153,7 +152,6 @@ int main(int argc, char *argv[])
 
          });
      /*Homescreen notify navigation end*/
-
 #else	// for only libwindowmanager
 	QGuiApplication app(argc, argv);
     app.setApplicationName("navigation");

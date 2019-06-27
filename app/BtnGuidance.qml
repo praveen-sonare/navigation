@@ -12,7 +12,7 @@ Item {
     property int sts_guide: 0
 
     onSts_guideChanged: {
-        console.log("onSts_guideChanged")
+        //console.log("onSts_guideChanged")
         switch(btn_guidance.sts_guide){
         case 0:
             if (root.st_demo_state === true){

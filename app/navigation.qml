@@ -936,7 +936,7 @@ ApplicationWindow {
 
                 console.log("navi:car_accumulated_distance======" + car_accumulated_distance)
                 car_accumulated_distance += car_driving_distance
-                do_setdemorouteinfo(map.currentpostion.latitude,map.currentpostion.longitude,next_direction,next_cross_distance)
+                do_setdemorouteinfo(map.currentpostion.latitude,map.currentpostion.longitude,root.car_direction,next_cross_distance)
 
                 if(btn_present_position.state === "Flowing")
                 {
