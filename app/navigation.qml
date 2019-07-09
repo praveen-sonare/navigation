@@ -49,6 +49,7 @@ ApplicationWindow {
 
 
     property string navigation_request_str: ""
+    property string startpos_request_str: ""
     property string api_str: "naviapi"
     property string verb_setcurretpos: "navicore_setcurrentpos"
     property string verb_getcurretpos: "navicore_getcurrentpos"
@@ -64,6 +65,8 @@ ApplicationWindow {
     property string verb_cancelguidance: "navicore_cancelguidance"
     property string verb_setdestinationdirection: "navicore_setdestdir"
     property string verb_setdemostate: "navicore_demostate"
+    property string verb_setguidancestartpos: "navicore_setguidancestartpos"
+    property string verb_setdistance: "navicore_setdistance"
     property string event_setwaypoints: "naviapi/navicore_setwaypoints"
 //    property string event_canceldestpos: "naviapi/navicore_canceldestpos" // not clear
     property string event_pausesimulation: "naviapi/navicore_pausesimulation"
@@ -118,11 +121,12 @@ ApplicationWindow {
 //                    var longitude = message_json[2].data[0].longitude
 //                    var startFromCurrentPos = message_json[2].data[0].startFromCurrentPosition
 //                    map.doSetWaypointsSlot(latitude,longitude,startFromCurrentPos);
+                      root.setdistance(btn_guidance.total_distance,0)
                       root.do_cancelguidance()
                       map.initDestination()
                       map.center = map.currentpostion
                       map.addDestination(QtPositioning.coordinate(35.6585580781371,139.745503664017))
-                      vui_startguidance()
+                      sleep_timer.start()
                 }
                 //Pause Simulation from poi app
                 else if(message_json[2].event === event_pausesimulation){
@@ -130,14 +134,14 @@ ApplicationWindow {
                 }
                 else if(message_json[2].event === event_gps){
                     if (st_demo_state === false){
-                        console.log ("navi:Receive Event======event_gps")
+                        // console.log ("navi:Receive Event======event_gps")
                         var lat = message_json[2].data.latitude
                         var lon = message_json[2].data.longitude
-                        console.log ("navi:Receive Event lat====== " + lat+" "+"lon======"+lon)
+                        // console.log ("navi:Receive Event lat====== " + lat+" "+"lon======"+lon)
                          map.currentpostion = QtPositioning.coordinate(lat, lon);
-                        console.log ("navi:last_car_pos_lat====== " + last_car_pos_lat+" "+"last_car_pos_lon======"+last_car_pos_lon)
+                        // console.log ("navi:last_car_pos_lat====== " + last_car_pos_lat+" "+"last_car_pos_lon======"+last_car_pos_lon)
                         car_driving_distance = map.calculateDistance(last_car_pos_lat,last_car_pos_lon,lat,lon)
-                        console.log("navi:car_driving_distance ====== "+car_driving_distance)
+                        // console.log("navi:car_driving_distance ====== "+car_driving_distance)
                         last_car_pos_lat = lat
                         last_car_pos_lon = lon
 
@@ -150,9 +154,9 @@ ApplicationWindow {
                 }
                 else if(message_json[2].event === event_heading){
                     if (st_demo_state === false) {
-                        console.log("navi:Receive event====== event_heading")
+                        // console.log("navi:Receive event====== event_heading")
                         carheading = message_json[2].data.heading
-                        console.log("navi: heading======"+carheading)
+                        // console.log("navi: heading======"+carheading)
                         if (map.state === "smooth_rotate_north"){
                             if(carheading>=0){
                                 car_direction = carheading+265-map.bearing
@@ -205,11 +209,11 @@ ApplicationWindow {
             else if(message_json[0] === msgid_enu.retok){
                 if (message_json[2].request.info === verb_getcurretpos){
                     if (st_demo_state === false){
-                        console.log("navi:Callback Response ====== verb_getcurretpos")
+                        // console.log("navi:Callback Response ====== verb_getcurretpos")
                         var currentlat = message_json[2].response[0].CurrentLatitude
                         var currentlon = message_json[2].response[0].CurrentLongitude
                         currentheading = message_json[2].response[0].CurrentHeading
-                         console.log ("navi:Response verb_getcurretpos currentlat====== " + currentlat+" currentlon======"+currentlon)
+                        //  console.log ("navi:Response verb_getcurretpos currentlat====== " + currentlat+" currentlon======"+currentlon)
                         car_position_lat = currentlat
                         car_position_lon = currentlon
 //                        map.currentpostion = QtPositioning.coordinate(car_position_lat, car_position_lon)
@@ -227,6 +231,15 @@ ApplicationWindow {
             }
         }
         active: false
+    }
+    Timer {
+        id: sleep_timer
+        repeat: false
+        interval: 2000
+        triggeredOnStart: false
+        onTriggered: {
+            vui_startguidance()
+        }
     }
 
     Timer {
@@ -342,7 +355,7 @@ ApplicationWindow {
     function do_setdestinationdirection(direction) {
         navigation_request_str = '[' + msgid_enu.call + ',"99999","' + api_str+'/'+verb_setdestinationdirection + '", {"state":"'+direction+ '"} ]'
         websocket.sendTextMessage (navigation_request_str)
-        console.log("navi:do_setdestinationdirection = " + navigation_request_str)
+        // console.log("navi:do_setdestinationdirection = " + navigation_request_str)
     }
 
     //start demo
@@ -350,6 +363,20 @@ ApplicationWindow {
         navigation_request_str = '[' + msgid_enu.call + ',"99999","' + api_str+'/'+verb_setdemostate + '", {"DemoState":"'+state+ '"} ]'
         websocket.sendTextMessage (navigation_request_str)
         console.log("navi:do_demostate = " + navigation_request_str)
+    }
+
+    //set guidance start pos
+    function do_setguidancestartpos() {
+        startpos_request_str = '[' + msgid_enu.call + ',"99999","' + api_str+'/'+verb_setguidancestartpos + '", {"StartLatitude":"' + last_car_pos_lat + '","StartLongitude":"'+ last_car_pos_lon + '"} ]'
+        websocket.sendTextMessage (startpos_request_str)
+        // console.log("navi:do_setguidancestartpos = " + startpos_request_str)
+    }
+
+    //set distance
+    function setdistance(totaldistance,cumulativedistance ) {
+        navigation_request_str = '[' + msgid_enu.call + ',"99999","' + api_str+'/'+verb_setdistance + '", {"TotalDistance":"'+totaldistance+ '","CumulativeDistance":"'+cumulativedistance + '"} ]'
+        websocket.sendTextMessage (navigation_request_str)
+        // console.log("navi:setdistance = " + navigation_request_str)
     }
 
     function vui_startguidance(){
@@ -577,7 +604,6 @@ ApplicationWindow {
                 opacity: 0.8
 			}
 		}
-		
 		MapItemView {
 			model: routeModel
 			delegate: routeDelegate
@@ -636,6 +662,7 @@ ApplicationWindow {
 
                 routeModel.update()
                 map.qmlSignalRouteInfo(car_position_lat, car_position_lon,coord.latitude,coord.longitude)
+                do_setguidancestartpos()
 
                 // update icon_end_point
                 icon_end_point.coordinate = coord
@@ -700,6 +727,8 @@ ApplicationWindow {
             for (var i=0; i<9; i++) {
                 routeQuery.setFeatureWeight(i, 0)
             }
+            imgdestinationstate = "0"
+            btn_guidance.total_distance = 0
             waypoint_count = 0
             pathcounter = 0
             segmentcounter = 0
@@ -724,7 +753,7 @@ ApplicationWindow {
 		{
             var startCoordinate = QtPositioning.coordinate(car_position_lat, car_position_lon)
 
-			console.log("calculateMarkerRoute")
+			// console.log("calculateMarkerRoute")
 			routeQuery.clearWaypoints();
             routeQuery.addWaypoint(startCoordinate)
             routeQuery.addWaypoint(mouseArea.lastCoordinate)
@@ -811,6 +840,7 @@ ApplicationWindow {
                             map.addDestination(lastCoordinate)
                         }
                         else {
+                            root.setdistance(btn_guidance.total_distance,0)
                             root.do_cancelguidance()
                             map.initDestination()
                             map.center = map.currentpostion
@@ -830,8 +860,8 @@ ApplicationWindow {
         }
         function updatePositon()
         {
-            console.log("navi: pathcounter = "+pathcounter+" path.length = "+routeModel.get(0).path.length)
-            console.log("navi: segmentcounter = "+segmentcounter+" segments.length = "+routeModel.get(0).segments.length)
+            // console.log("navi: pathcounter = "+pathcounter+" path.length = "+routeModel.get(0).path.length)
+            // console.log("navi: segmentcounter = "+segmentcounter+" segments.length = "+routeModel.get(0).segments.length)
             if(pathcounter <= routeModel.get(0).path.length - 1){
                 // calculate distance
                 var next_distance = calculateDistance(map.currentpostion.latitude,
@@ -852,7 +882,7 @@ ApplicationWindow {
                                                             routeModel.get(0).segments[segmentcounter].path[0].latitude,
                                                             routeModel.get(0).segments[segmentcounter].path[0].longitude);
 
-                console.log("navi:next_distance="+next_distance+" next_direction"+next_direction+" next_cross_distance"+next_cross_distance)
+                // console.log("navi:next_distance="+next_distance+" next_direction"+next_direction+" next_cross_distance"+next_cross_distance)
 
                 // map rotateAnimation cntrol
                 if(root.st_heading_up) {
@@ -870,7 +900,7 @@ ApplicationWindow {
                         is_rotating = 360 - is_rotating;
                     }
 
-                    console.log("navi:is_rotating========= "+ is_rotating)
+                    // console.log("navi:is_rotating========= "+ is_rotating)
 
                     // rotation angle case
                     if(is_rotating > 180){
@@ -913,7 +943,7 @@ ApplicationWindow {
                 {
 //                    car_accumulated_distance += next_distance
 //                    do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
-                    console.log("lqy:pathcounter ======" + pathcounter)
+                    // console.log("lqy:pathcounter ======" + pathcounter)
 //                    console.log("lqy:routeModel.get(0).path.length - 1 ======" + routeModel.get(0).path.length - 1)
                     if(pathcounter < routeModel.get(0).path.length - 1){
                         pathcounter++
@@ -934,8 +964,9 @@ ApplicationWindow {
 //                   do_setdemorouteinfo(map.currentpostion.latitude, map.currentpostion.longitude,next_direction,car_accumulated_distance)
                 }
 
-                console.log("navi:car_accumulated_distance======" + car_accumulated_distance)
+                // console.log("navi:car_accumulated_distance======" + car_accumulated_distance)
                 car_accumulated_distance += car_driving_distance
+                root.setdistance(btn_guidance.total_distance,car_accumulated_distance)
                 do_setdemorouteinfo(map.currentpostion.latitude,map.currentpostion.longitude,root.car_direction,next_cross_distance)
 
                 if(btn_present_position.state === "Flowing")
@@ -1106,7 +1137,7 @@ ApplicationWindow {
 
                 // report a new instruction if current position matches with the head position of the segment
                 if(segmentcounter <= routeModel.get(0).segments.length - 1){
-                     if(next_cross_distance < 2){
+                     if(next_cross_distance < 8){
                         progress_next_cross.setProgress(0)
                         if(segmentcounter < routeModel.get(0).segments.length - 1){
                             segmentcounter++

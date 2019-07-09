@@ -137,7 +137,8 @@ int main(int argc, char *argv[])
 	engine.load(QUrl(QStringLiteral("qrc:/navigation.qml")));
  	QObject *root = engine.rootObjects().first();
 	QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
-    qhsHandler->setQuickWindow(window);
+     qhsHandler->setQuickWindow(window);
+
     /*Homescreen notify navigation start*/
         qhsHandler->set_event_handler(QLibHomeScreen::Event_StartNavigation, [root](json_object *object){
 //            QMetaObject::invokeMethod(root,"vui_startguidance");
