@@ -449,8 +449,8 @@ ApplicationWindow {
                 stackView.showMessage(qsTr("Coordinates"),text);
             }
             onGeocodeFinished:{
-                if (map.geocodeModel.status == GeocodeModel.Ready) {
-                    if (map.geocodeModel.count == 0) {
+                if (map.geocodeModel.status === GeocodeModel.Ready) {
+                    if (map.geocodeModel.count === 0) {
                         stackView.showMessage(qsTr("Geocode Error"),qsTr("Unsuccessful geocode"))
                     } else if (map.geocodeModel.count > 1) {
                         stackView.showMessage(qsTr("Ambiguous geocode"), map.geocodeModel.count + " " +
@@ -458,7 +458,7 @@ ApplicationWindow {
                     } else {
                         stackView.showMessage(qsTr("Location"), geocodeMessage(),page)
                     }
-                } else if (map.geocodeModel.status == GeocodeModel.Error) {
+                } else if (map.geocodeModel.status === GeocodeModel.Error) {
                     stackView.showMessage(qsTr("Geocode Error"),qsTr("Unsuccessful geocode"))
                 }
             }
@@ -467,10 +467,10 @@ ApplicationWindow {
             onShowGeocodeInfo: stackView.showMessage(qsTr("Location"),geocodeMessage(),page)
 
             onErrorChanged: {
-                if (map.error != Map.NoError) {
+                if (map.error !== Map.NoError) {
                     var title = qsTr("ProviderError")
                     var message =  map.errorString + "<br/><br/><b>" + qsTr("Try to select other provider") + "</b>"
-                    if (map.error == Map.MissingRequiredParameterError)
+                    if (map.error === Map.MissingRequiredParameterError)
                         message += "<br/>" + qsTr("or see") + " \'mapviewer --help\' "
                                 + qsTr("how to pass plugin parameters.")
                     stackView.showMessage(title,message);

@@ -181,7 +181,7 @@ Map {
     {
         var count = map.mapItems.length
         var co = Qt.createComponent(item+'.qml')
-        if (co.status == Component.Ready) {
+        if (co.status === Component.Ready) {
             var o = co.createObject(map)
             o.setGeometry(map.markers, currentMarker)
             map.addMapItem(o)
@@ -204,13 +204,13 @@ Map {
         var myArray = new Array()
         var count = map.markers.length
         for (var i = 0; i<count; i++){
-            if (index != i) myArray.push(map.markers[i])
+            if (index !== i) myArray.push(map.markers[i])
         }
 
         map.removeMapItem(map.markers[index])
         map.markers[index].destroy()
         map.markers = myArray
-        if (markers.length == 0) markerCounter = 0
+        if (markers.length === 0) markerCounter = 0
     }
 
     function calculateMarkerRoute()
@@ -526,7 +526,7 @@ Map {
                 }
 
                 onPositionChanged: {
-                    if (mouse.button == Qt.LeftButton) {
+                    if (mouse.button === Qt.LeftButton) {
                         map.lastX = mouse.x + parent.x
                         map.lastY = mouse.y + parent.y
                     }
@@ -596,7 +596,7 @@ Map {
                         if (pressed) parent.radius = parent.center.distanceTo(
                                          map.toCoordinate(Qt.point(mouse.x, mouse.y)))
                     }
-                    if (mouse.button == Qt.LeftButton) {
+                    if (mouse.button === Qt.LeftButton) {
                         map.lastX = mouse.x + parent.x
                         map.lastY = mouse.y + parent.y
                     }
@@ -656,7 +656,7 @@ Map {
         }
 
         onPositionChanged: {
-            if (mouse.button == Qt.LeftButton) {
+            if (mouse.button === Qt.LeftButton) {
                 map.lastX = mouse.x
                 map.lastY = mouse.y
             }

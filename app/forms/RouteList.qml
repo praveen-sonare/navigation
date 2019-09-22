@@ -79,8 +79,8 @@ ListView {
             }
         }
         //! [routeinfomodel2]
-        totalTravelTime = routeModel.count == 0 ? "" : Helper.formatTime(routeModel.get(0).travelTime)
-        totalDistance = routeModel.count == 0 ? "" : Helper.formatDistance(routeModel.get(0).distance)
+        totalTravelTime = routeModel.count === 0 ? "" : Helper.formatTime(routeModel.get(0).travelTime)
+        totalDistance = routeModel.count === 0 ? "" : Helper.formatDistance(routeModel.get(0).distance)
     }
 //! [routeinfomodel3]
 }

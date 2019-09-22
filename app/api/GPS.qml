@@ -55,7 +55,7 @@ WebSocket {
             case msgid.event:
                 var payload = JSON.parse(JSON.stringify(json[2]))
                 var event = payload.event
-                if (event == "gps/location") {
+                if (event === "gps/location") {
                     var data = json[2].data
                     var latitude = data.latitude
                     var longitude = data.longitude

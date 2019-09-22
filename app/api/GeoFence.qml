@@ -55,7 +55,7 @@ WebSocket {
             case msgid.event:
                 var payload = JSON.parse(JSON.stringify(json[2]))
                 var event = payload.event
-                if (event == "geofence/fence") {
+                if (event === "geofence/fence") {
                     var data = json[2].data
                     console.log("geofence event - name: " + data.name + " state: " + data.state)
                 }

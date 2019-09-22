@@ -74,7 +74,7 @@ MapQuickItem {
                 map.pressY = mouse.y
                 map.currentMarker = -1
                 for (var i = 0; i< map.markers.length; i++){
-                    if (marker == map.markers[i]){
+                    if (marker === map.markers[i]){
                         map.currentMarker = i
                         break
                     }
