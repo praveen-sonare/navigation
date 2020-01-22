@@ -41,9 +41,12 @@
 import QtQuick 2.5
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.0
+import QtQuick.Window 2.11
+
 import QtQuick.VirtualKeyboard 2.1
 import QtLocation 5.6
 import QtPositioning 5.5
+
 import AGL.Demo.Controls 1.0
 import "map"
 import "menus"
@@ -54,6 +57,9 @@ ApplicationWindow {
     id: appWindow
     property variant map
     property variant parameters
+
+    width: Screen.width
+    height: Screen.height
 
     //defaults
     //! [routecoordinate]
