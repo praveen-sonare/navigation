@@ -10,10 +10,9 @@
     <param name="geoclue" value="ws" />
     <param name="geofence" value="ws" />
     <param name="gps" value="ws" />
-    <param name="windowmanager" value="ws" />
-    <param name="homescreen" value="ws" />
   </feature>
   <feature name="urn:AGL:widget:required-permission">
     <param name="urn:AGL:permission::public:no-htdocs" value="required" />
+    <param name="urn:AGL:permission::public:display" value="required" />
   </feature>
 </widget>

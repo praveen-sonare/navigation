@@ -48,18 +48,12 @@
 #include <QtQml/qqml.h>
 #include <QtQuickControls2/QQuickStyle>
 #include <QQuickWindow>
-#include <libhomescreen.hpp>
-#include <qlibwindowmanager.h>
 
 int main(int argc, char *argv[])
 {
-
-    QString myname = QString("Navigation");
-
     qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
     QGuiApplication app(argc, argv);
 
-    QQuickStyle::setStyle("AGL");
     QQmlApplicationEngine engine;
     QQmlContext *context = engine.rootContext();
 
@@ -74,59 +68,26 @@ int main(int argc, char *argv[])
     if (positionalArguments.length() == 2) {
         int port = positionalArguments.takeFirst().toInt();
         QString secret = positionalArguments.takeFirst();
+
         QUrl bindingAddress;
         bindingAddress.setScheme(QStringLiteral("ws"));
         bindingAddress.setHost(QStringLiteral("localhost"));
         bindingAddress.setPort(port);
         bindingAddress.setPath(QStringLiteral("/api"));
+
         QUrlQuery query;
         query.addQueryItem(QStringLiteral("token"), secret);
         bindingAddress.setQuery(query);
         context->setContextProperty(QStringLiteral("bindingAddress"), bindingAddress);
         std::string token = secret.toStdString();
-        LibHomeScreen* hs = new LibHomeScreen();
-        QLibWindowmanager* qwm = new QLibWindowmanager();
-
-        // WindowManager
-        if(qwm->init(port,secret) != 0){
-            exit(EXIT_FAILURE);
-        }
-        // Request a surface as described in layers.json windowmanager’s file
-        if (qwm->requestSurface(myname) != 0) {
-            exit(EXIT_FAILURE);
-        }
-        // Create an event callback against an event type. Here a lambda is called when SyncDraw event occurs
-        qwm->set_event_handler(QLibWindowmanager::Event_SyncDraw, [qwm, myname](json_object *object) {
-            fprintf(stderr, "Surface got syncDraw!\n");
-            qwm->endDraw(myname);
-        });
-
-        // HomeScreen
-        hs->init(port, token.c_str());
-        // Set the event handler for Event_TapShortcut which will activate the surface for windowmanager
-        hs->set_event_handler(LibHomeScreen::Event_TapShortcut, [qwm, myname](json_object *object){
-            json_object *appnameJ = nullptr;
-            if(json_object_object_get_ex(object, "application_name", &appnameJ))
-            {
-                const char *appname = json_object_get_string(appnameJ);
-                if(myname == appname)
-                {
-                    qDebug("Surface %s got tapShortcut\n", appname);
-                    qwm->activateSurface(myname);
-                }
-            }
-        });
 
         QVariantMap parameters;
         parameters[QStringLiteral("osm.useragent")] = QStringLiteral("Automotive Grade Linux Navigation");
 
         engine.addImportPath(QStringLiteral(":/imports"));
         engine.load(QUrl(QStringLiteral("qrc:/mapviewer.qml")));
-        QObject::connect(&engine, SIGNAL(quit()), qApp, SLOT(quit()));
 
         QObject *root = engine.rootObjects().first();
-        QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
-        QObject::connect(window, SIGNAL(frameSwapped()), qwm, SLOT(slotActivateSurface()));
 
         QMetaObject::invokeMethod(root, "initializeProviders",
                                   Q_ARG(QVariant, QVariant::fromValue(parameters)));

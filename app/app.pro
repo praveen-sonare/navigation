@@ -1,7 +1,6 @@
 TARGET = navigation
 
 CONFIG += link_pkgconfig
-PKGCONFIG += libhomescreen qlibwindowmanager
 
 QT = qml network quick positioning location quickcontrols2
 
