@@ -13,7 +13,12 @@ copy_config.commands = $(COPY_FILE) \"$$replace(copy_config.depends, /, $$QMAKE_
 QMAKE_EXTRA_TARGETS += copy_config
 PRE_TARGETDEPS += $$copy_config.target
 
+WGT_TYPE =
+CONFIG(debug, debug|release) {
+    WGT_TYPE = -debug
+}
+
 wgt.target = package
-wgt.commands = wgtpkg-pack -f -o navigation.wgt root
+wgt.commands = wgtpkg-pack -f -o navigation$${WGT_TYPE}.wgt root
 
 QMAKE_EXTRA_TARGETS += wgt

@@ -10,6 +10,10 @@ static {
     QT += svg
 }
 
+CONFIG(release, debug|release) {
+    QMAKE_POST_LINK = $(STRIP) --strip-unneeded $(TARGET)
+}
+
 SOURCES += main.cpp
 
 RESOURCES += \
